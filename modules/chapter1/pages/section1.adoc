@@ -12,4 +12,3 @@ This section presents a scenario based on a real customer issue.
 
 
 If you exhaust your experience and resources, and you're unable to solve the issue on your own, use the guided solution to step through one possible solution, with tips for addressing similar issues.
-

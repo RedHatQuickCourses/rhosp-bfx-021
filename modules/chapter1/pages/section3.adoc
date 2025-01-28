@@ -1,0 +1,44 @@
+= Break-fix Scenario
+
+Objectives:
+
+* Investigate the instance connectivity issue in Red Hat OpenStack Platform.
+
+* Solve the instance connectivity in the hands-on lab environment.
+
+Scenario: 
+Your team manages a Red Hat OpenStack Platform (RHOSP) infrastructure used by an important development team for your company. There was a requirement from your internal networking team to have Open Virtual Network (OVN), an open-source software-defined networking (SDN) solution that seamlessly integrates with OpenStack. Recently networking team noticed that there is connectivity issue with instance running in OpenStack envrionment.
+
+
+They noticed the following error:
+
+----
+(overcloud) [stack@director ~]$ ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211
+Connection closed by 172.25.250.211 port 22
+----
+
+
+== Recreate scenario
+
+* Recreate this scenario by running the lab` script on director VM as stack user:
+----
+[student@workstation ~]$ ssh stack@director
+
+[stack@director ~]$ source overcloudrc
+
+(overcloud) [stack@director ~]$ lab start bfx021
+Running start action against scenario bfx021
+Run the following command:
+ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211
+----
+
+In the preceding output, ip address can differ in your lab environemnt.
+
+* This breaks the connectivity to instance.
+
+* To ensure scenario is recreated, run the ssh command from the previous output:
++
+----
+(overcloud) [stack@director ~]$ ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211
+Connection closed by 172.25.250.211 port 22
+----
