@@ -1,0 +1,17 @@
+= Summary
+
+* Attempted to SSH into the instance and check basic network connectivity.
+
+* Verified SSH connectivity by testing port 22 using netcat or telnet.
+
+* Identified the compute node hosting the instance.
+
+* Inspected metadata service and found it failed to run on the compute node.
+
+* Ran neutron-ovn-db-sync-util to diagnose and repair the missing metadata port issue.
+
+* Confirmed metadata resources are available after repair.
+
+* Rebooted the instance to fetch metadata on boot.
+
+* SSH into the instance to verify functionality.
