@@ -83,6 +83,13 @@
   </li>
 </ul>
   </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter3/section1.html">Summary</a>
+  </li>
+</ul>
+  </li>
 </ul>
   </nav>
 </div>
@@ -212,13 +219,11 @@ rtt min/avg/max/mdev = 2.409/2.409/2.409/0.000 ms</pre>
 </li>
 <li>
 <p>Use either the nc (netcat) or telnet command to verify the connectivity.</p>
-<div class="quoteblock">
-<blockquote>
-<div class="paragraph">
-<p>(overcloud) [stack@director ~]$ nc 172.25.250.211 22
-(overcloud) [stack@director ~]$ telnet 172.25.250.211 22</p>
+<div class="listingblock">
+<div class="content">
+<pre>(overcloud) [stack@director ~]$ nc 172.25.250.211 22
+(overcloud) [stack@director ~]$ telnet 172.25.250.211 22</pre>
 </div>
-</blockquote>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -246,12 +251,10 @@ rtt min/avg/max/mdev = 2.409/2.409/2.409/0.000 ms</pre>
 </li>
 <li>
 <p>Run the SSH command in verbose mode (use the -vvv flag) to gain more detailed insights into the authentication process.</p>
-<div class="quoteblock">
-<blockquote>
-<div class="paragraph">
-<p>(overcloud) [stack@director ~]$ ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211 -vvv</p>
+<div class="listingblock">
+<div class="content">
+<pre>(overcloud) [stack@director ~]$ ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211 -vvv</pre>
 </div>
-</blockquote>
 </div>
 <div class="paragraph">
 <p>Observe that authentication was attempted but ultimately failed.</p>
