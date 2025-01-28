@@ -1,3 +1,140 @@
-= Guided solution (page 2 of 2)
+= Guided solution (page 2)
 
-FIXME: Provide step-by-step instructions here to resolve the issue.
+1. Open the log file to see a detailed message.
+
+2. Now list the ports for the network associated with the instance and use openstack port list --network <network-name> --long to identify the ports.
++
+----
+(overcloud) [stack@director ~]$ openstack network list
++--------------------------------------+-------------------------+--------------------------------------+
+| ID                                   | Name                    | Subnets                              |
++--------------------------------------+-------------------------+--------------------------------------+
+| 36fe284c-f220-4284-9bab-b28f87f1088d | scenario-bfx021-network | bc027ed8-5359-4c61-a13f-5202ea8e20ab |
+| 5720ec2e-20a6-4a06-86bb-acda4a1e59e6 | public                  | d915c9a6-a629-436c-b70e-b2a98ce9aa76 |
++--------------------------------------+-------------------------+--------------------------------------+
+
+(overcloud) [stack@director ~]$
+
+(overcloud) [stack@director ~]$ openstack port list --network scenario-bfx021-network --long
++--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+-----------------+--------------------------+------+
+| ID                                   | Name | MAC Address       | Fixed IP Addresses                                                            | Status | Security Groups | Device Owner             | Tags |
++--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+-----------------+--------------------------+------+
+| 52fc243d-d091-455d-b5eb-f10b017aab56 |      | fa:16:3e:6f:8e:6d | ip_address='192.168.140.21', subnet_id='bc027ed8-5359-4c61-a13f-5202ea8e20ab' | ACTIVE | None            | compute:nova             |      |
+| cba6d0b2-5a49-49fc-8f2a-7dbc706291ba |      | fa:16:3e:d0:f6:28 | ip_address='192.168.140.1', subnet_id='bc027ed8-5359-4c61-a13f-5202ea8e20ab'  | ACTIVE | None            | network:router_interface |      |
++--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+-----------------+--------------------------+------+
+----
+
+3. List all the ports with device owner and device ID using openstack port list --network <network-name> --long -c id -c device_owner -c device_id.
++
+----
+(overcloud) [stack@director ~]$ openstack port list --network scenario-bfx021-network --long -c id -c device_owner -c device_id
++--------------------------------------+--------------------------+-----------+
+| ID                                   | Device Owner             | device_id |
++--------------------------------------+--------------------------+-----------+
+| 52fc243d-d091-455d-b5eb-f10b017aab56 | compute:nova             | None      |
+| cba6d0b2-5a49-49fc-8f2a-7dbc706291ba | network:router_interface | None      |
++--------------------------------------+--------------------------+-----------+
+----
++
+You see that there is no port with device ID as ovn_meta.
++
+This port is missing here.
++
+Each network needs to have this port.
++
+To fix this problem inside the Neutron api container there is a utility called neutron-ovn-db-sync-util which compares neutrons MySQL database with the OVN database and makes sure everything is in sync.
++
+The utility has multiple modes like log, repair, so on.
+
+4. Connect to controller VM and attach to neutron_api container.
++
+----
+(overcloud) [stack@director ~]$ ssh tripleo-admin@overcloud-control0
+Register this system with Red Hat Insights: insights-client --register
+Create an account or view all your systems at https://red.ht/insights-dashboard
+Last login: Fri Mar 15 12:30:14 2024 from 172.25.249.11
+
+[tripleo-admin-admin@overcloud-controller-0 ~]$ sudo su -
+Last login: Fri Mar 15 12:30:26 UTC 2024 on pts/0
+
+[root@overcloud-controller-0 ~]# podman exec -it neutron_api bash
+----
+
+5. Within the container, run neutron-ovn-db-sync-util in log mode.
++
+----
+[neutron@overcloud-controller-0 /]$ neutron-ovn-db-sync-util --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini --ovn-neutron_sync_mode log --debug
+----
+
+6. Check the toollogs in the controller node.
++
+----
+[neutron@overcloud-controller-0 /]$ less /var/log/neutron/neutron-ovn-db-sync-util.log
+----
+
+7. You observe that the metadata warning saying Missing metadata port found in Neutron network.
++
+----
+2024-03-15 12:31:05.296 995 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [req-045b506f-08f8-4a71-a2eb-a0676844f902 - - - - -] Missing metadata port found in Neutron for network 36fe284c-f220-4284-9bab-b28f87f1088d
+----
+
+8. Now run the neutron-ovn-db-sync-util command with repair option.
++
+----
+[neutron@overcloud-controller-0 /]$ neutron-ovn-db-sync-util --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini --ovn-neutron_sync_mode repair --debug
+----
+
+9. Check the logs again and see that now the tool is repairing the missing metadata port: Creating missing metadata port in Neutron and OVN for network.
++
+----
+2024-03-15 12:32:15.051 1017 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [req-a
+21e2011-9850-454b-a056-fe5264307c85 - - - - -] Missing metadata port found in Neutron for network 36fe284
+c-f220-4284-9bab-b28f87f1088d
+2024-03-15 12:32:15.052 1017 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [req-a21e2011-9850-454b-a056-fe5264307c85 - - - - -] Creating missing metadadata port in Neutron and OVN for network 36fe284c-f220-4284-9bab-b28f87f1088d
+----
+
+10. Verify the metadata resources those were missing are now available after the DB sync.
++
+----
+[root@overcloud-novacompute-1 ~]# ip net
+ovnmeta-36fe284c-f220-4284-9bab-b28f87f1088d (id: 0)
+[root@overcloud-novacompute-1 ~]# podman ps | grep haproxy
+22cdab61691b  director.ctlplane.localdomain:8787/rhosp-rhel9/openstack-neutron-metadata-agent-ovn:17.1  /bin/bash -c HAPR...  59 seconds ago     Up 59 seconds                           neutron-haproxy-ovnmeta-36fe284c-f220-4284-9bab-b28f87f1088d
+----
+
+11. Restart the instance to fetch metadata on boot.
++
+----
+(overcloud) [stack@director ~]$ openstack server reboot scenario-bfx021-vm
+----
++
+[NOTE]
+====
+If you did not receive any output in the previous step (#20), re-run those commands after the VM has been rebooted.
+====
+
+12. Now that the instance has been rebooted, you can establish an SSH connection to it to verify its functionality.
++
+----
+(overcloud) [stack@director ~]$ ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211
+$
+$ cat /etc/cirros/version
+0.5.2
+$
+----
+
+== Evaluation
+
+As the stack user on the director machine, use the lab command to grade your work. Correct any reported failures and rerun the command until successful.
+----
+[student@workstation ~]$ lab grade breakfix021-connect
+----
+
+== Finish
+
+As the student user on the workstation machine, use the lab command to complete this exercise. This step is important to ensure that resources from previous exercises do not impact upcoming exercises.
+----
+[student@workstation ~]$ lab finish breakfix021-connect
+----
+This concludes this section.
+
