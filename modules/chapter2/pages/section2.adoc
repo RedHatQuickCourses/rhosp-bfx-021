@@ -24,6 +24,7 @@
 +--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+-----------------+--------------------------+------+
 ----
 
+
 3. List all the ports with device owner and device ID using openstack port list --network <network-name> --long -c id -c device_owner -c device_id.
 +
 ----
@@ -36,15 +37,15 @@
 +--------------------------------------+--------------------------+-----------+
 ----
 +
-You see that there is no port with device ID as ovn_meta.
+- You see that there is no port with device ID as ovn_meta.
 +
-This port is missing here.
+- This port is missing here.
 +
-Each network needs to have this port.
+- Each network needs to have this port.
 +
-To fix this problem inside the Neutron api container there is a utility called neutron-ovn-db-sync-util which compares neutrons MySQL database with the OVN database and makes sure everything is in sync.
+- To fix this problem inside the Neutron api container there is a utility called neutron-ovn-db-sync-util which compares neutrons MySQL database with the OVN database and makes sure everything is in sync.
 +
-The utility has multiple modes like log, repair, so on.
+- The utility has multiple modes like log, repair, so on.
 
 4. Connect to controller VM and attach to neutron_api container.
 +
@@ -60,11 +61,13 @@ Last login: Fri Mar 15 12:30:26 UTC 2024 on pts/0
 [root@overcloud-controller-0 ~]# podman exec -it neutron_api bash
 ----
 
+
 5. Within the container, run neutron-ovn-db-sync-util in log mode.
 +
 ----
 [neutron@overcloud-controller-0 /]$ neutron-ovn-db-sync-util --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini --ovn-neutron_sync_mode log --debug
 ----
+
 
 6. Check the toollogs in the controller node.
 +
@@ -72,17 +75,20 @@ Last login: Fri Mar 15 12:30:26 UTC 2024 on pts/0
 [neutron@overcloud-controller-0 /]$ less /var/log/neutron/neutron-ovn-db-sync-util.log
 ----
 
+
 7. You observe that the metadata warning saying Missing metadata port found in Neutron network.
 +
 ----
 2024-03-15 12:31:05.296 995 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [req-045b506f-08f8-4a71-a2eb-a0676844f902 - - - - -] Missing metadata port found in Neutron for network 36fe284c-f220-4284-9bab-b28f87f1088d
 ----
 
+
 8. Now run the neutron-ovn-db-sync-util command with repair option.
 +
 ----
 [neutron@overcloud-controller-0 /]$ neutron-ovn-db-sync-util --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini --ovn-neutron_sync_mode repair --debug
 ----
+
 
 9. Check the logs again and see that now the tool is repairing the missing metadata port: Creating missing metadata port in Neutron and OVN for network.
 +
@@ -93,6 +99,7 @@ c-f220-4284-9bab-b28f87f1088d
 2024-03-15 12:32:15.052 1017 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [req-a21e2011-9850-454b-a056-fe5264307c85 - - - - -] Creating missing metadadata port in Neutron and OVN for network 36fe284c-f220-4284-9bab-b28f87f1088d
 ----
 
+
 10. Verify the metadata resources those were missing are now available after the DB sync.
 +
 ----
@@ -101,6 +108,7 @@ ovnmeta-36fe284c-f220-4284-9bab-b28f87f1088d (id: 0)
 [root@overcloud-novacompute-1 ~]# podman ps | grep haproxy
 22cdab61691b  director.ctlplane.localdomain:8787/rhosp-rhel9/openstack-neutron-metadata-agent-ovn:17.1  /bin/bash -c HAPR...  59 seconds ago     Up 59 seconds                           neutron-haproxy-ovnmeta-36fe284c-f220-4284-9bab-b28f87f1088d
 ----
+
 
 11. Restart the instance to fetch metadata on boot.
 +
@@ -112,6 +120,7 @@ ovnmeta-36fe284c-f220-4284-9bab-b28f87f1088d (id: 0)
 ====
 If you did not receive any output in the previous step (#20), re-run those commands after the VM has been rebooted.
 ====
+
 
 12. Now that the instance has been rebooted, you can establish an SSH connection to it to verify its functionality.
 +

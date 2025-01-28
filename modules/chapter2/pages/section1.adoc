@@ -28,6 +28,7 @@ ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@1
 When you run any command with sudo, in case it expects a password then provide the student as a password.
 ====
 
+
 2. Run the ssh command from the previous lab command output and notice the Connection closed error. Also run the ping command against instance IP.
 +
 ----
@@ -45,14 +46,16 @@ rtt min/avg/max/mdev = 2.409/2.409/2.409/0.000 ms
 +
 You observe that you can ping the instance but not able to ssh to it.
 
+
 3. To further diagnose, check the connectivity to port 22 (SSH) to the instance.
+
 
 4. Use either the nc (netcat) or telnet command to verify the connectivity.
 +
-____
+----
 (overcloud) [stack@director ~]$ nc 172.25.250.211 22
 (overcloud) [stack@director ~]$ telnet 172.25.250.211 22
-____
+----
 +
 [NOTE]
 ====
@@ -65,17 +68,19 @@ The SSH key being used for authentication might be problematic.
 +
 Inspect and ensure that the SSH key setup is correct.
 
+
 5. Run the SSH command in verbose mode (use the -vvv flag) to gain more detailed insights into the authentication process.
 +
-____
+----
 (overcloud) [stack@director ~]$ ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211 -vvv
-____
+----
 +
 Observe that authentication was attempted but ultimately failed. 
 +
 This indicates a specific authentication issue. 
 +
 Access the overcloud environment to determine the specific compute node where the RHOSP instance is currently hosted.
+
 
 6. Use the openstack server list --long command to list instances and identify the compute node hosting your instance.
 +
@@ -90,6 +95,7 @@ Access the overcloud environment to determine the specific compute node where th
 +
 Per above output, the instance is running on overcloud-novacompute-1, this might vary in your case.
 
+
 7. Log in to the compute node where the instance is running. You might use SSH to connect to the node.
 +
 ----
@@ -102,6 +108,7 @@ Last login: Fri Jan 26 12:15:25 2024 from 172.25.249.11
 
 [root@overcloud-novacompute-1 ~]#
 ----
+
 
 8. Investigate the metadata service on the compute node by verifying if the necessary metadata resources are correctly provisioned or not.
 +
@@ -118,6 +125,7 @@ Last login: Fri Jan 26 12:15:25 2024 from 172.25.249.11
 +
 No metadata namespace listed here and haproxy container is not running. Hence metadata service seems to be not working on this node.
 
+
 9. Now list the ports for the network associated with the instance. You need to use openstack port list --network <network-name> --long to identify the ports and list the ports for the network associated with the instance.
 +
 ----
@@ -128,6 +136,7 @@ No metadata namespace listed here and haproxy container is not running. Hence me
 | 52fc243d-d091-455d-b5eb-f10b017aab56 |      | fa:16:3e:6f:8e:6d | ip_address='192.168.140.21', subnet_id='bc027ed8-5359-4c61-a13f-5202ea8e20ab' | ACTIVE |
 +--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+
 ----
+
 
 10. Look for the port ID in the compute node's ovn-mtadata-agent.log file.
 +
