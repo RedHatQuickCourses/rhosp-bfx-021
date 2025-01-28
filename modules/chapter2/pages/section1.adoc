@@ -62,11 +62,11 @@ You observe that you can ping the instance but not able to ssh to it.
 The port 22 is indeed open on the instance, and basic network connectivity is established.
 ====
 +
-The problem might be related to authentication issues rather than network connectivity.
+- The problem might be related to authentication issues rather than network connectivity.
 +
-The SSH key being used for authentication might be problematic.
+- The SSH key being used for authentication might be problematic.
 +
-Inspect and ensure that the SSH key setup is correct.
+- Inspect and ensure that the SSH key setup is correct.
 
 
 5. Run the SSH command in verbose mode (use the -vvv flag) to gain more detailed insights into the authentication process.
@@ -75,11 +75,11 @@ Inspect and ensure that the SSH key setup is correct.
 (overcloud) [stack@director ~]$ ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211 -vvv
 ----
 +
-Observe that authentication was attempted but ultimately failed. 
+- Observe that authentication was attempted but ultimately failed. 
 +
-This indicates a specific authentication issue. 
+- This indicates a specific authentication issue. 
 +
-Access the overcloud environment to determine the specific compute node where the RHOSP instance is currently hosted.
+- Access the overcloud environment to determine the specific compute node where the RHOSP instance is currently hosted.
 
 
 6. Use the openstack server list --long command to list instances and identify the compute node hosting your instance.
