@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Guided solution (page 2 of 2) :: RHOSP Networking Break-fix Practice - Troubleshooting VM Connectivity Issue</title>
+    <title>Guided solution (page 2) :: RHOSP Networking Break-fix Practice - Troubleshooting VM Connectivity Issue</title>
     <link rel="prev" href="section1.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../_/css/site.css">
@@ -73,10 +73,10 @@
     <a class="nav-link" href="index.html">Guided solution</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="section1.html">Guided solution (page 1 of 2)</a>
+    <a class="nav-link" href="section1.html">Guided solution (page 1)</a>
   </li>
   <li class="nav-item is-current-page" data-depth="2">
-    <a class="nav-link" href="section2.html">Guided solution (page 2 of 2)</a>
+    <a class="nav-link" href="section2.html">Guided solution (page 2)</a>
   </li>
 </ul>
   </li>
@@ -112,7 +112,7 @@
   <ul>
     <li><a href="../index.html">RHOSP Networking Break-fix Practice - Troubleshooting VM Connectivity Issue</a></li>
     <li><a href="index.html">Guided solution</a></li>
-    <li><a href="section2.html">Guided solution (page 2 of 2)</a></li>
+    <li><a href="section2.html">Guided solution (page 2)</a></li>
   </ul>
 </nav>
 </div>
@@ -121,12 +121,206 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Guided solution (page 2 of 2)</h1>
+<h1 class="page">Guided solution (page 2)</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Open the log file to see a detailed message.</p>
+</li>
+<li>
+<p>Now list the ports for the network associated with the instance and use openstack port list --network &lt;network-name&gt; --long to identify the ports.</p>
+<div class="listingblock">
+<div class="content">
+<pre>(overcloud) [stack@director ~]$ openstack network list
++--------------------------------------+-------------------------+--------------------------------------+
+| ID                                   | Name                    | Subnets                              |
++--------------------------------------+-------------------------+--------------------------------------+
+| 36fe284c-f220-4284-9bab-b28f87f1088d | scenario-bfx021-network | bc027ed8-5359-4c61-a13f-5202ea8e20ab |
+| 5720ec2e-20a6-4a06-86bb-acda4a1e59e6 | public                  | d915c9a6-a629-436c-b70e-b2a98ce9aa76 |
++--------------------------------------+-------------------------+--------------------------------------+
+
+(overcloud) [stack@director ~]$
+
+(overcloud) [stack@director ~]$ openstack port list --network scenario-bfx021-network --long
++--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+-----------------+--------------------------+------+
+| ID                                   | Name | MAC Address       | Fixed IP Addresses                                                            | Status | Security Groups | Device Owner             | Tags |
++--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+-----------------+--------------------------+------+
+| 52fc243d-d091-455d-b5eb-f10b017aab56 |      | fa:16:3e:6f:8e:6d | ip_address='192.168.140.21', subnet_id='bc027ed8-5359-4c61-a13f-5202ea8e20ab' | ACTIVE | None            | compute:nova             |      |
+| cba6d0b2-5a49-49fc-8f2a-7dbc706291ba |      | fa:16:3e:d0:f6:28 | ip_address='192.168.140.1', subnet_id='bc027ed8-5359-4c61-a13f-5202ea8e20ab'  | ACTIVE | None            | network:router_interface |      |
++--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+-----------------+--------------------------+------+</pre>
+</div>
+</div>
+</li>
+<li>
+<p>List all the ports with device owner and device ID using openstack port list --network &lt;network-name&gt; --long -c id -c device_owner -c device_id.</p>
+<div class="listingblock">
+<div class="content">
+<pre>(overcloud) [stack@director ~]$ openstack port list --network scenario-bfx021-network --long -c id -c device_owner -c device_id
++--------------------------------------+--------------------------+-----------+
+| ID                                   | Device Owner             | device_id |
++--------------------------------------+--------------------------+-----------+
+| 52fc243d-d091-455d-b5eb-f10b017aab56 | compute:nova             | None      |
+| cba6d0b2-5a49-49fc-8f2a-7dbc706291ba | network:router_interface | None      |
++--------------------------------------+--------------------------+-----------+</pre>
+</div>
+</div>
 <div class="paragraph">
-<p>FIXME: Provide step-by-step instructions here to resolve the issue.</p>
+<p>You see that there is no port with device ID as ovn_meta.</p>
+</div>
+<div class="paragraph">
+<p>This port is missing here.</p>
+</div>
+<div class="paragraph">
+<p>Each network needs to have this port.</p>
+</div>
+<div class="paragraph">
+<p>To fix this problem inside the Neutron api container there is a utility called neutron-ovn-db-sync-util which compares neutrons MySQL database with the OVN database and makes sure everything is in sync.</p>
+</div>
+<div class="paragraph">
+<p>The utility has multiple modes like log, repair, so on.</p>
+</div>
+</li>
+<li>
+<p>Connect to controller VM and attach to neutron_api container.</p>
+<div class="listingblock">
+<div class="content">
+<pre>(overcloud) [stack@director ~]$ ssh tripleo-admin@overcloud-control0
+Register this system with Red Hat Insights: insights-client --register
+Create an account or view all your systems at https://red.ht/insights-dashboard
+Last login: Fri Mar 15 12:30:14 2024 from 172.25.249.11
+
+[tripleo-admin-admin@overcloud-controller-0 ~]$ sudo su -
+Last login: Fri Mar 15 12:30:26 UTC 2024 on pts/0
+
+[root@overcloud-controller-0 ~]# podman exec -it neutron_api bash</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Within the container, run neutron-ovn-db-sync-util in log mode.</p>
+<div class="listingblock">
+<div class="content">
+<pre>[neutron@overcloud-controller-0 /]$ neutron-ovn-db-sync-util --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini --ovn-neutron_sync_mode log --debug</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Check the toollogs in the controller node.</p>
+<div class="listingblock">
+<div class="content">
+<pre>[neutron@overcloud-controller-0 /]$ less /var/log/neutron/neutron-ovn-db-sync-util.log</pre>
+</div>
+</div>
+</li>
+<li>
+<p>You observe that the metadata warning saying Missing metadata port found in Neutron network.</p>
+<div class="listingblock">
+<div class="content">
+<pre>2024-03-15 12:31:05.296 995 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [req-045b506f-08f8-4a71-a2eb-a0676844f902 - - - - -] Missing metadata port found in Neutron for network 36fe284c-f220-4284-9bab-b28f87f1088d</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Now run the neutron-ovn-db-sync-util command with repair option.</p>
+<div class="listingblock">
+<div class="content">
+<pre>[neutron@overcloud-controller-0 /]$ neutron-ovn-db-sync-util --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini --ovn-neutron_sync_mode repair --debug</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Check the logs again and see that now the tool is repairing the missing metadata port: Creating missing metadata port in Neutron and OVN for network.</p>
+<div class="listingblock">
+<div class="content">
+<pre>2024-03-15 12:32:15.051 1017 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [req-a
+21e2011-9850-454b-a056-fe5264307c85 - - - - -] Missing metadata port found in Neutron for network 36fe284
+c-f220-4284-9bab-b28f87f1088d
+2024-03-15 12:32:15.052 1017 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [req-a21e2011-9850-454b-a056-fe5264307c85 - - - - -] Creating missing metadadata port in Neutron and OVN for network 36fe284c-f220-4284-9bab-b28f87f1088d</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Verify the metadata resources those were missing are now available after the DB sync.</p>
+<div class="listingblock">
+<div class="content">
+<pre>[root@overcloud-novacompute-1 ~]# ip net
+ovnmeta-36fe284c-f220-4284-9bab-b28f87f1088d (id: 0)
+[root@overcloud-novacompute-1 ~]# podman ps | grep haproxy
+22cdab61691b  director.ctlplane.localdomain:8787/rhosp-rhel9/openstack-neutron-metadata-agent-ovn:17.1  /bin/bash -c HAPR...  59 seconds ago     Up 59 seconds                           neutron-haproxy-ovnmeta-36fe284c-f220-4284-9bab-b28f87f1088d</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Restart the instance to fetch metadata on boot.</p>
+<div class="listingblock">
+<div class="content">
+<pre>(overcloud) [stack@director ~]$ openstack server reboot scenario-bfx021-vm</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you did not receive any output in the previous step (#20), re-run those commands after the VM has been rebooted.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Now that the instance has been rebooted, you can establish an SSH connection to it to verify its functionality.</p>
+<div class="listingblock">
+<div class="content">
+<pre>(overcloud) [stack@director ~]$ ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211
+$
+$ cat /etc/cirros/version
+0.5.2
+$</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_evaluation"><a class="anchor" href="#_evaluation"></a>Evaluation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As the stack user on the director machine, use the lab command to grade your work. Correct any reported failures and rerun the command until successful.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>[student@workstation ~]$ lab grade breakfix021-connect</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_finish"><a class="anchor" href="#_finish"></a>Finish</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As the student user on the workstation machine, use the lab command to complete this exercise. This step is important to ensure that resources from previous exercises do not impact upcoming exercises.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>[student@workstation ~]$ lab finish breakfix021-connect</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This concludes this section.</p>
+</div>
+</div>
 </div>
 <nav class="pagination">
-  <span class="prev"><a href="section1.html">Guided solution (page 1 of 2)</a></span>
+  <span class="prev"><a href="section1.html">Guided solution (page 1)</a></span>
 </nav>
 </article>
   </div>

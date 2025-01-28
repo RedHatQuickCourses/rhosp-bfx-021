@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Guided solution (page 1 of 2) :: RHOSP Networking Break-fix Practice - Troubleshooting VM Connectivity Issue</title>
+    <title>Guided solution (page 1) :: RHOSP Networking Break-fix Practice - Troubleshooting VM Connectivity Issue</title>
     <link rel="prev" href="index.html">
     <link rel="next" href="section2.html">
     <meta name="generator" content="Antora 3.1.3">
@@ -74,10 +74,10 @@
     <a class="nav-link" href="index.html">Guided solution</a>
 <ul class="nav-list">
   <li class="nav-item is-current-page" data-depth="2">
-    <a class="nav-link" href="section1.html">Guided solution (page 1 of 2)</a>
+    <a class="nav-link" href="section1.html">Guided solution (page 1)</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="section2.html">Guided solution (page 2 of 2)</a>
+    <a class="nav-link" href="section2.html">Guided solution (page 2)</a>
   </li>
 </ul>
   </li>
@@ -113,7 +113,7 @@
   <ul>
     <li><a href="../index.html">RHOSP Networking Break-fix Practice - Troubleshooting VM Connectivity Issue</a></li>
     <li><a href="index.html">Guided solution</a></li>
-    <li><a href="section1.html">Guided solution (page 1 of 2)</a></li>
+    <li><a href="section1.html">Guided solution (page 1)</a></li>
   </ul>
 </nav>
 </div>
@@ -122,13 +122,225 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Guided solution (page 1 of 2)</h1>
+<h1 class="page">Guided solution (page 1)</h1>
+<div class="sect1">
+<h2 id="_objectives"><a class="anchor" href="#_objectives"></a>Objectives</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Investigate the instance connectivity issue in Red Hat OpenStack Platform.</p>
+</li>
+<li>
+<p>Solve the instance connectivity in the hands-on lab environment.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_outcomes"><a class="anchor" href="#_outcomes"></a>Outcomes</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Investigate why ssh to instance is not working.</p>
+</li>
+<li>
+<p>Fix the ssh to instance failing issue.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_instructions"><a class="anchor" href="#_instructions"></a>Instructions</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Break the environment if you have not done it and step through the fix.</p>
+<div class="listingblock">
+<div class="content">
+<pre>[student@workstation ~]$ ssh stack@director
+
+[stack@director ~]$ source overcloudrc
+
+(overcloud) [stack@director ~]$ lab start bfx021
+Running start action against scenario bfx021
+Run the following command:
+ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
 <div class="paragraph">
-<p>FIXME: Provide step-by-step instructions here to resolve the issue.</p>
+<p>When you run any command with sudo, in case it expects a password then provide the student as a password.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Run the ssh command from the previous lab command output and notice the Connection closed error. Also run the ping command against instance IP.</p>
+<div class="listingblock">
+<div class="content">
+<pre>(overcloud) [stack@director ~]$ ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211
+Connection closed by 172.25.250.211 port 22
+
+(overcloud) [stack@director ~]$ ping 172.25.250.211 -c 1
+PING 172.25.250.211 (172.25.250.211) 56(84) bytes of data.
+64 bytes from 172.25.250.211: icmp_seq=1 ttl=63 time=2.41 ms
+
+--- 172.25.250.211 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 2.409/2.409/2.409/0.000 ms</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You observe that you can ping the instance but not able to ssh to it.</p>
+</div>
+</li>
+<li>
+<p>To further diagnose, check the connectivity to port 22 (SSH) to the instance.</p>
+</li>
+<li>
+<p>Use either the nc (netcat) or telnet command to verify the connectivity.</p>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>(overcloud) [stack@director ~]$ nc 172.25.250.211 22
+(overcloud) [stack@director ~]$ telnet 172.25.250.211 22</p>
+</div>
+</blockquote>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The port 22 is indeed open on the instance, and basic network connectivity is established.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The problem might be related to authentication issues rather than network connectivity.</p>
+</div>
+<div class="paragraph">
+<p>The SSH key being used for authentication might be problematic.</p>
+</div>
+<div class="paragraph">
+<p>Inspect and ensure that the SSH key setup is correct.</p>
+</div>
+</li>
+<li>
+<p>Run the SSH command in verbose mode (use the -vvv flag) to gain more detailed insights into the authentication process.</p>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>(overcloud) [stack@director ~]$ ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211 -vvv</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>Observe that authentication was attempted but ultimately failed.</p>
+</div>
+<div class="paragraph">
+<p>This indicates a specific authentication issue.</p>
+</div>
+<div class="paragraph">
+<p>Access the overcloud environment to determine the specific compute node where the RHOSP instance is currently hosted.</p>
+</div>
+</li>
+<li>
+<p>Use the openstack server list --long command to list instances and identify the compute node hosting your instance.</p>
+<div class="listingblock">
+<div class="content">
+<pre>(overcloud) [stack@director ~]$ openstack server list --long
++--------------------------------------+--------------------+--------+------------+-------------+--------------------------------------------------------+---------------------+--------------------------------------+-------------+--------------------------------------+-------------------+-------------------------------------+------------+
+| ID                                   | Name               | Status | Task State | Power State | Networks                                               | Image Name          | Image ID                             | Flavor Name | Flavor ID                            | Availability Zone | Host                                | Properties |
++--------------------------------------+--------------------+--------+------------+-------------+--------------------------------------------------------+---------------------+--------------------------------------+-------------+--------------------------------------+-------------------+-------------------------------------+------------+
+| a606cfa2-45a2-4ead-90b7-d98fb44f28b3 | scenario-bfx021-vm | ACTIVE | None       | Running     | scenario-bfx021-network=172.25.250.211, 192.168.140.21 | cirros-0.5.2-x86_64 | 62cde336-52ed-47cd-93bb-27b3b5fa8836 | m1.medium   | 9c943b58-2bc7-44d4-a187-a915958a7091 | nova              | overcloud-novacompute-1.localdomain |            |
++--------------------------------------+--------------------+--------+------------+-------------+--------------------------------------------------------+---------------------+--------------------------------------+-------------+--------------------------------------+-------------------+-------------------------------------+------------+</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Per above output, the instance is running on overcloud-novacompute-1, this might vary in your case.</p>
+</div>
+</li>
+<li>
+<p>Log in to the compute node where the instance is running. You might use SSH to connect to the node.</p>
+<div class="listingblock">
+<div class="content">
+<pre>(undercloud) [stack@director ~]$ ssh tripleo-admin@overcloud-compute1
+Register this system with Red Hat Insights: insights-client --register
+Create an account or view all your systems at https://red.ht/insights-dashboard
+Last login: Fri Jan 26 12:15:25 2024 from 172.25.249.11
+
+[tripleo-admin@overcloud-novacompute-1 ~]$ sudo su -
+
+[root@overcloud-novacompute-1 ~]#</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Investigate the metadata service on the compute node by verifying if the necessary metadata resources are correctly provisioned or not.</p>
+<div class="listingblock">
+<div class="content">
+<pre>[root@overcloud-novacompute-1 ~]# podman ps -a | grep ovn_metadata_agent
+04911f7b1b10  director.ctlplane.localdomain:8787/rhosp-rhel9/openstack-neutron-metadata-agent-ovn:17.1  kolla_start           7 weeks ago     Up 30 minutes (healthy)              ovn_metadata_agent
+
+[root@overcloud-novacompute-1 ~]# ip net
+[root@overcloud-novacompute-1 ~]#
+
+[root@overcloud-novacompute-1 ~]# podman ps -a | grep haproxy
+3e48ab34e447  director.ctlplane.localdomain:8787/rhosp-rhel9/openstack-neutron-metadata-agent-ovn:17.1  /container_puppet...  7 weeks ago     Exited (0) 7 weeks ago               create_haproxy_wrapper</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>No metadata namespace listed here and haproxy container is not running. Hence metadata service seems to be not working on this node.</p>
+</div>
+</li>
+<li>
+<p>Now list the ports for the network associated with the instance. You need to use openstack port list --network &lt;network-name&gt; --long to identify the ports and list the ports for the network associated with the instance.</p>
+<div class="listingblock">
+<div class="content">
+<pre>(overcloud) [stack@director ~]$ openstack port list --server scenario-bfx021-vm
++--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+
+| ID                                   | Name | MAC Address       | Fixed IP Addresses                                                            | Status |
++--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+
+| 52fc243d-d091-455d-b5eb-f10b017aab56 |      | fa:16:3e:6f:8e:6d | ip_address='192.168.140.21', subnet_id='bc027ed8-5359-4c61-a13f-5202ea8e20ab' | ACTIVE |
++--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Look for the port ID in the compute node&#8217;s ovn-mtadata-agent.log file.</p>
+<div class="listingblock">
+<div class="content">
+<pre>[root@overcloud-novacompute-1 ~]# grep 52fc243d-d091-455d-b5eb-f10b017aab56 /var/log/containers/neutron/ovn-metadata-agent.log*
+/var/log/containers/neutron/ovn-metadata-agent.log.1:2024-03-15 11:27:50.247 2235 INFO neutron.agent.ovn.metadata.agent [-] Port 52fc243d-d091-455d-b5eb-f10b017aab56 in datapath 36fe284c-f220-4284-9bab-b28f87f1088d bound to our chassis</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
 </div>
 <nav class="pagination">
   <span class="prev"><a href="index.html">Guided solution</a></span>
-  <span class="next"><a href="section2.html">Guided solution (page 2 of 2)</a></span>
+  <span class="next"><a href="section2.html">Guided solution (page 2)</a></span>
 </nav>
 </article>
   </div>
