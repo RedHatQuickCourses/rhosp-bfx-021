@@ -239,14 +239,18 @@ rtt min/avg/max/mdev = 2.409/2.409/2.409/0.000 ms</pre>
 </tr>
 </table>
 </div>
-<div class="paragraph">
+<div class="ulist">
+<ul>
+<li>
 <p>The problem might be related to authentication issues rather than network connectivity.</p>
-</div>
-<div class="paragraph">
+</li>
+<li>
 <p>The SSH key being used for authentication might be problematic.</p>
-</div>
-<div class="paragraph">
+</li>
+<li>
 <p>Inspect and ensure that the SSH key setup is correct.</p>
+</li>
+</ul>
 </div>
 </li>
 <li>
@@ -256,14 +260,18 @@ rtt min/avg/max/mdev = 2.409/2.409/2.409/0.000 ms</pre>
 <pre>(overcloud) [stack@director ~]$ ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211 -vvv</pre>
 </div>
 </div>
-<div class="paragraph">
+<div class="ulist">
+<ul>
+<li>
 <p>Observe that authentication was attempted but ultimately failed.</p>
-</div>
-<div class="paragraph">
+</li>
+<li>
 <p>This indicates a specific authentication issue.</p>
-</div>
-<div class="paragraph">
+</li>
+<li>
 <p>Access the overcloud environment to determine the specific compute node where the RHOSP instance is currently hosted.</p>
+</li>
+</ul>
 </div>
 </li>
 <li>
