@@ -2,9 +2,9 @@
 
 == Check your work using the grading script
 ----
-[stack@director ~]$ lab grade bfx021
+[student@workstation ~]$ lab grade bfx021
 Running grade action against scenario bfx021
-cirros@172.25.250.211's password:
+cirros@192.168.51.191's password:
 Grading scenario bfx022: PASSED!
 ----
 Instance IP address from the preceding output can differ in your environment.
@@ -15,9 +15,9 @@ Provide the gocubsgo as a password.
 == Success Criteria
 Successful completion of this activity requires that ssh to instance is working:
 ----
-(overcloud) [stack@director ~]$ ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211
+[student@workstation ~]$ ssh -i /home/student/osp_training/.scenariobfx020/scenario-bfx020-key.pem cirros@192.168.51.191
 sign_and_send_pubkey: no mutual signature supported
-cirros@172.25.250.211's password:
+cirros@192.168.51.191's password:
 $
 ----
 

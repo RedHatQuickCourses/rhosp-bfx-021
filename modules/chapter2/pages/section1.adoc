@@ -13,14 +13,17 @@
 1. Break the environment if you have not done it and step through the fix.
 +
 ----
-[student@workstation ~]$ ssh stack@director
+[student@workstation ~]$ oc login -u admin -p redhatocp https://api.ocp4.example.com:6443
+Login successful.
 
-[stack@director ~]$ source overcloudrc
+You have access to 76 projects, the list has been suppressed. You can list all projects with 'oc projects'
 
-(overcloud) [stack@director ~]$ lab start bfx021
+Using project "openstack".
+
+[student@workstation ~]$ lab start bfx021
 Running start action against scenario bfx021
 Run the following command:
-ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211
+ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.191
 ----
 +
 [NOTE]
@@ -32,14 +35,14 @@ When you run any command with sudo, in case it expects a password then provide t
 2. Run the ssh command from the previous lab command output and notice the Connection closed error. Also run the ping command against instance IP.
 +
 ----
-(overcloud) [stack@director ~]$ ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211
-Connection closed by 172.25.250.211 port 22
+[student@workstation ~]$ ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.191
+Connection closed by 192.168.51.191 port 22
 
-(overcloud) [stack@director ~]$ ping 172.25.250.211 -c 1
-PING 172.25.250.211 (172.25.250.211) 56(84) bytes of data.
-64 bytes from 172.25.250.211: icmp_seq=1 ttl=63 time=2.41 ms
+[student@workstation ~]$ ping 192.168.51.191 -c 1
+PING 192.168.51.191 (192.168.51.191) 56(84) bytes of data.
+64 bytes from 192.168.51.191: icmp_seq=1 ttl=63 time=2.41 ms
 
---- 172.25.250.211 ping statistics ---
+--- 192.168.51.191 ping statistics ---
 1 packets transmitted, 1 received, 0% packet loss, time 0ms
 rtt min/avg/max/mdev = 2.409/2.409/2.409/0.000 ms
 ----
@@ -53,8 +56,8 @@ You observe that you can ping the instance but not able to ssh to it.
 4. Use either the nc (netcat) or telnet command to verify the connectivity.
 +
 ----
-(overcloud) [stack@director ~]$ nc 172.25.250.211 22
-(overcloud) [stack@director ~]$ telnet 172.25.250.211 22
+[student@workstation ~]$ nc 192.168.51.191 22
+[student@workstation ~]$ telnet 192.168.51.191 22
 ----
 +
 [NOTE]
@@ -72,55 +75,54 @@ The port 22 is indeed open on the instance, and basic network connectivity is es
 5. Run the SSH command in verbose mode (use the -vvv flag) to gain more detailed insights into the authentication process.
 +
 ----
-(overcloud) [stack@director ~]$ ssh -i /home/stack/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@172.25.250.211 -vvv
+[student@workstation ~]$ ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.191 -vvv
 ----
 +
 - Observe that authentication was attempted but ultimately failed. 
 +
 - This indicates a specific authentication issue. 
 +
-- Access the overcloud environment to determine the specific compute node where the RHOSP instance is currently hosted.
+- Access the RHOSO environment to determine the specific compute node where the RHOSP instance is currently hosted.
 
 
 6. Use the openstack server list --long command to list instances and identify the compute node hosting your instance.
 +
 ----
-(overcloud) [stack@director ~]$ openstack server list --long
-+--------------------------------------+--------------------+--------+------------+-------------+--------------------------------------------------------+---------------------+--------------------------------------+-------------+--------------------------------------+-------------------+-------------------------------------+------------+
-| ID                                   | Name               | Status | Task State | Power State | Networks                                               | Image Name          | Image ID                             | Flavor Name | Flavor ID                            | Availability Zone | Host                                | Properties |
-+--------------------------------------+--------------------+--------+------------+-------------+--------------------------------------------------------+---------------------+--------------------------------------+-------------+--------------------------------------+-------------------+-------------------------------------+------------+
-| a606cfa2-45a2-4ead-90b7-d98fb44f28b3 | scenario-bfx021-vm | ACTIVE | None       | Running     | scenario-bfx021-network=172.25.250.211, 192.168.140.21 | cirros-0.5.2-x86_64 | 62cde336-52ed-47cd-93bb-27b3b5fa8836 | m1.medium   | 9c943b58-2bc7-44d4-a187-a915958a7091 | nova              | overcloud-novacompute-1.localdomain |            |
-+--------------------------------------+--------------------+--------+------------+-------------+--------------------------------------------------------+---------------------+--------------------------------------+-------------+--------------------------------------+-------------------+-------------------------------------+------------+
+[student@workstation ~]$ oc exec -n openstack openstackclient -- openstack server list --long
++--------------------------------------+--------------------+--------+------------+-------------+--------------------------------------------------------+---------------------+--------------------------------------+----------+-------------------+---------------------------+------------+-------------+
+| ID                                   | Name               | Status | Task State | Power State | Networks                                               | Image Name          | Image ID                             | Flavor   | Availability Zone | Host                      | Properties | Host Status |
++--------------------------------------+--------------------+--------+------------+-------------+--------------------------------------------------------+---------------------+--------------------------------------+----------+-------------------+---------------------------+------------+-------------+
+| 6843b5d4-f6b8-4f66-933b-88dd381b2ce3 | scenario-bfx021-vm | ACTIVE | None       | Running     | scenario-bfx021-network=192.168.140.99, 192.168.51.191 | cirros-0.5.2-x86_64 | 10210206-c30a-4765-8547-0dad335b5675 | m1.small | nova              | compute02.srv.example.com |            | UP          |
++--------------------------------------+--------------------+--------+------------+-------------+--------------------------------------------------------+---------------------+--------------------------------------+----------+-------------------+---------------------------+------------+-------------+
 ----
 +
-Per above output, the instance is running on overcloud-novacompute-1, this might vary in your case.
+Per above output, the instance is running on compute02.srv.example.com, this might vary in your case.
 
 
 7. Log in to the compute node where the instance is running. You might use SSH to connect to the node.
 +
 ----
-(undercloud) [stack@director ~]$ ssh tripleo-admin@overcloud-compute1
+[student@workstation ~]$ ssh root@compute02.srv.example.com
+Activate the web console with: systemctl enable --now cockpit.socket
+
 Register this system with Red Hat Insights: insights-client --register
 Create an account or view all your systems at https://red.ht/insights-dashboard
-Last login: Fri Jan 26 12:15:25 2024 from 172.25.249.11
+Last login: Mon Mar 31 09:31:34 2025 from 192.168.51.254
 
-[tripleo-admin@overcloud-novacompute-1 ~]$ sudo su -
-
-[root@overcloud-novacompute-1 ~]#
+[root@compute02 ~]#
 ----
 
 
 8. Investigate the metadata service on the compute node by verifying if the necessary metadata resources are correctly provisioned or not.
 +
 ----
-[root@overcloud-novacompute-1 ~]# podman ps -a | grep ovn_metadata_agent
-04911f7b1b10  director.ctlplane.localdomain:8787/rhosp-rhel9/openstack-neutron-metadata-agent-ovn:17.1  kolla_start           7 weeks ago     Up 30 minutes (healthy)              ovn_metadata_agent
+[root@compute02 ~]# podman ps -a | grep ovn_metadata_agent
+528faed57842  registry.redhat.io/rhoso/openstack-neutron-metadata-agent-ovn-rhel9@sha256:b01c35ee7c7bfb03c91981cbed675628e2a145cb9b0fb123370d4679907736f4  kolla_start  4 months ago  Up 4 hours              ovn_metadata_agent
 
-[root@overcloud-novacompute-1 ~]# ip net
-[root@overcloud-novacompute-1 ~]#
+[root@compute02 ~]# ip net
+[root@compute02 ~]#
 
-[root@overcloud-novacompute-1 ~]# podman ps -a | grep haproxy
-3e48ab34e447  director.ctlplane.localdomain:8787/rhosp-rhel9/openstack-neutron-metadata-agent-ovn:17.1  /container_puppet...  7 weeks ago     Exited (0) 7 weeks ago               create_haproxy_wrapper
+[root@compute02 ~]# podman ps -a | grep haproxy
 ----
 +
 No metadata namespace listed here and haproxy container is not running. Hence metadata service seems to be not working on this node.
@@ -129,11 +131,11 @@ No metadata namespace listed here and haproxy container is not running. Hence me
 9. Now list the ports for the network associated with the instance. You need to use openstack port list --network <network-name> --long to identify the ports and list the ports for the network associated with the instance.
 +
 ----
-(overcloud) [stack@director ~]$ openstack port list --server scenario-bfx021-vm
+[student@workstation ~]$ oc exec -n openstack openstackclient -- openstack port list --server scenario-bfx021-vm
 +--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+
 | ID                                   | Name | MAC Address       | Fixed IP Addresses                                                            | Status |
 +--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+
-| 52fc243d-d091-455d-b5eb-f10b017aab56 |      | fa:16:3e:6f:8e:6d | ip_address='192.168.140.21', subnet_id='bc027ed8-5359-4c61-a13f-5202ea8e20ab' | ACTIVE |
+| fcdec0db-bf35-4792-9af6-5feee377efdd |      | fa:16:3e:df:19:9f | ip_address='192.168.140.99', subnet_id='671e0166-173e-4c85-a925-dac8546d1bd7' | ACTIVE |
 +--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+
 ----
 
@@ -141,6 +143,7 @@ No metadata namespace listed here and haproxy container is not running. Hence me
 10. Look for the port ID in the compute node's ovn-mtadata-agent.log file.
 +
 ----
-[root@overcloud-novacompute-1 ~]# grep 52fc243d-d091-455d-b5eb-f10b017aab56 /var/log/containers/neutron/ovn-metadata-agent.log*
-/var/log/containers/neutron/ovn-metadata-agent.log.1:2024-03-15 11:27:50.247 2235 INFO neutron.agent.ovn.metadata.agent [-] Port 52fc243d-d091-455d-b5eb-f10b017aab56 in datapath 36fe284c-f220-4284-9bab-b28f87f1088d bound to our chassis
+[root@compute02 ~]# grep fcdec0db-bf35-4792-9af6-5feee377efdd /var/log/containers/neutron/ovn-metadata-agent.log
+2025-04-01 10:48:43.009 2354 DEBUG ovsdbapp.backend.ovs_idl.event [-] Matched UPDATE: PortBindingUpdatedEvent(events=('update',), table='Port_Binding', conditions=None, old_conditions=None), priority=20 to row=Port_Binding(mac=['fa:16:3e:df:19:9f 192.168.140.99'], port_security=['fa:16:3e:df:19:9f 192.168.140.99'], type=, nat_addresses=[], virtual_parent=[], up=[False], options={'requested-chassis': 'compute02.srv.example.com'}, parent_port=[], requested_additional_chassis=[], ha_chassis_group=[], external_ids={'neutron:cidrs': '192.168.140.99/24', 'neutron:device_id': '6843b5d4-f6b8-4f66-933b-88dd381b2ce3', 'neutron:device_owner': 'compute:nova', 'neutron:mtu': '', 'neutron:network_name': 'neutron-c84e1f23-9d86-47c9-9cd3-851633941dac', 'neutron:port_capabilities': '', 'neutron:port_name': '', 'neutron:project_id': '7ac1618d984947c0bfcbf713a94fed4a', 'neutron:revision_number': '2', 'neutron:security_group_ids': 'b807a477-7a1c-4d22-ae3d-a9f7c7975701', 'neutron:subnet_pool_addr_scope4': '', 'neutron:subnet_pool_addr_scope6': '', 'neutron:vnic_type': 'normal'}, additional_chassis=[], tag=[], additional_encap=[], encap=[], mirror_rules=[], datapath=b2c6aad5-a91c-46d6-a224-3e3aac7ff061, chassis=[<ovs.db.idl.Row object at 0x7f5c074917c0>], tunnel_key=3, gateway_chassis=[], requested_chassis=[<ovs.db.idl.Row object at 0x7f5c074917c0>], logical_port=fcdec0db-bf35-4792-9af6-5feee377efdd) old=Port_Binding(chassis=[]) matches /usr/lib/python3.9/site-packages/ovsdbapp/backend/ovs_idl/event.py:43
+2025-04-01 10:48:43.010 2354 INFO neutron.agent.ovn.metadata.agent [-] Port fcdec0db-bf35-4792-9af6-5feee377efdd in datapath c84e1f23-9d86-47c9-9cd3-851633941dac bound to our chassis
 ----
