@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Guided solution (page 2) :: RHOSP Networking Break-fix Practice - Troubleshooting VM Connectivity Issue</title>
+    <link rel="prev" href="section1.html">
+    <link rel="next" href="../chapter3/section1.html">
+    <meta name="generator" content="Antora 3.1.3">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">RHOSP Networking Break-fix Practice - Troubleshooting VM Connectivity Issue</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="rhosp-bfx021" data-version="1">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">RHOSP Networking Break-fix Practice - Troubleshooting VM Connectivity Issue</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Home</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../LABENV/index.html">Lab Environment</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../chapter1/index.html">What’s in this break-fix?</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chapter1/section1.html">Break-fix activity</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chapter1/section2.html">Check your work</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="index.html">Guided solution</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="section1.html">Guided solution (page 1)</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="section2.html">Guided solution (page 2)</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter3/section1.html">Summary</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">RHOSP Networking Break-fix Practice - Troubleshooting VM Connectivity Issue</span>
+    <span class="version">1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">RHOSP Networking Break-fix Practice - Troubleshooting VM Connectivity Issue</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">RHOSP Networking Break-fix Practice - Troubleshooting VM Connectivity Issue</a></li>
+    <li><a href="index.html">Guided solution</a></li>
+    <li><a href="section2.html">Guided solution (page 2)</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Guided solution (page 2)</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Open the log file to see a detailed message.</p>
+</li>
+<li>
+<p>Now list the ports for the network associated with the instance and use openstack port list --network &lt;network-name&gt; --long to identify the ports.</p>
+<div class="listingblock">
+<div class="content">
+<pre>[student@workstation ~]$ oc exec -n openstack openstackclient -- openstack network list
++--------------------------------------+-------------------------+--------------------------------------+
+| ID                                   | Name                    | Subnets                              |
++--------------------------------------+-------------------------+--------------------------------------+
+| c84e1f23-9d86-47c9-9cd3-851633941dac | scenario-bfx021-network | 671e0166-173e-4c85-a925-dac8546d1bd7 |
+| ee961465-e812-4563-aaa8-05adb3476889 | public                  | 3c99909a-9d7a-486a-9df5-6e3fb210df61 |
++--------------------------------------+-------------------------+--------------------------------------+
+
+[student@workstation ~]$ oc exec -n openstack openstackclient -- openstack port list --network scenario-bfx021-network --long
++--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+-----------------+--------------------------+------+
+| ID                                   | Name | MAC Address       | Fixed IP Addresses                                                            | Status | Security Groups | Device Owner             | Tags |
++--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+-----------------+--------------------------+------+
+| e20c4444-38e4-4ce6-9999-993e1f7882f4 |      | fa:16:3e:12:88:90 | ip_address='192.168.140.1', subnet_id='671e0166-173e-4c85-a925-dac8546d1bd7'  | ACTIVE | None            | network:router_interface |      |
+| fcdec0db-bf35-4792-9af6-5feee377efdd |      | fa:16:3e:df:19:9f | ip_address='192.168.140.99', subnet_id='671e0166-173e-4c85-a925-dac8546d1bd7' | ACTIVE | None            | compute:nova             |      |
++--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+-----------------+--------------------------+------+</pre>
+</div>
+</div>
+</li>
+<li>
+<p>List all the ports with device owner and device ID using openstack port list --network &lt;network-name&gt; --long -c id -c device_owner -c device_id.</p>
+<div class="listingblock">
+<div class="content">
+<pre>[student@workstation ~]$ oc exec -n openstack openstackclient -- openstack port list --network scenario-bfx021-network --long -c id -c device_owner -c device_id
++--------------------------------------+--------------------------+-----------+
+| ID                                   | Device Owner             | device_id |
++--------------------------------------+--------------------------+-----------+
+| e20c4444-38e4-4ce6-9999-993e1f7882f4 | network:router_interface | None      |
+| fcdec0db-bf35-4792-9af6-5feee377efdd | compute:nova             | None      |
++--------------------------------------+--------------------------+-----------+</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>You see that there is no port with device ID as ovn_meta.</p>
+</li>
+<li>
+<p>This port is missing here.</p>
+</li>
+<li>
+<p>Each network needs to have this port.</p>
+</li>
+<li>
+<p>To fix this problem inside the Neutron api container there is a utility called neutron-ovn-db-sync-util which compares neutrons MySQL database with the OVN database and makes sure everything is in sync.</p>
+</li>
+<li>
+<p>The utility has multiple modes like log, repair, so on.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Use OpenShift client to attach to neutron_api POD.</p>
+<div class="listingblock">
+<div class="content">
+<pre>[student@workstation ~]$ oc rsh -n openstack $(oc get pods -n openstack -l service=neutron -o name)
+Defaulted container "neutron-api" out of: neutron-api, neutron-httpd
+sh-5.1$</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Within the POD, run neutron-ovn-db-sync-util in log mode.</p>
+<div class="listingblock">
+<div class="content">
+<pre>neutron-ovn-db-sync-util --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini --ovn-neutron_sync_mode log --debug | tee /tmp/neutron-ovn-db-sync-util.log</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Check the toollogs in the POD.</p>
+<div class="listingblock">
+<div class="content">
+<pre>[neutron@overcloud-controller-0 /]$ less /tmp/neutron-ovn-db-sync-util.log</pre>
+</div>
+</div>
+</li>
+<li>
+<p>You observe that the metadata warning saying Missing metadata port found in Neutron network.</p>
+<div class="listingblock">
+<div class="content">
+<pre>2025-04-01 12:37:32.879 66 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [None req-b9d849c8-db41-4acd-8ede-2819c6fb279c - - - - - -] Missing metadata port found in Neutron for network c84e1f23-9d86-47c9-9cd3-851633941dacESC[00m</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Now run the neutron-ovn-db-sync-util command with repair option.</p>
+<div class="listingblock">
+<div class="content">
+<pre>sh-5.1$ neutron-ovn-db-sync-util --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini --ovn-neutron_sync_mode repair --debug  | tee /tmp/neutron-ovn-db-sync-util.log</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Check the logs again and see that now the tool is repairing the missing metadata port: Creating missing metadata port in Neutron and OVN for network.</p>
+<div class="listingblock">
+<div class="content">
+<pre>2025-04-01 12:38:44.473 75 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [None req-89b87fc9-c463-4464-87bc-62a221d17e89 - - - - - -] Missing metadata port found in Neutron for network c84e1f23-9d86-47c9-9cd3-851633941dac
+2025-04-01 12:38:44.474 75 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [None req-89b87fc9-c463-4464-87bc-62a221d17e89 - - - - - -] Creating missing metadata port in Neutron and OVN for network c84e1f23-9d86-47c9-9cd3-851633941dac</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Verify the metadata resources those were missing are now available after the DB sync.</p>
+<div class="listingblock">
+<div class="content">
+<pre>[root@compute02 ~]# ip net
+ovnmeta-c84e1f23-9d86-47c9-9cd3-851633941dac (id: 0)
+[root@compute02 ~]# podman ps | grep haproxy
+3b65c4ae3696  registry.redhat.io/rhoso/openstack-neutron-metadata-agent-ovn-rhel9@sha256:b01c35ee7c7bfb03c91981cbed675628e2a145cb9b0fb123370d4679907736f4  /bin/bash -c exec...  25 seconds ago  Up 25 seconds              neutron-haproxy-ovnmeta-c84e1f23-9d86-47c9-9cd3-851633941dac</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Restart the instance to fetch metadata on boot.</p>
+<div class="listingblock">
+<div class="content">
+<pre>[student@workstation ~]$ oc exec -n openstack openstackclient -- openstack server reboot scenario-bfx021-vm</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you did not receive any output in the previous step (#20), re-run those commands after the VM has been rebooted.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Now that the instance has been rebooted, you can establish an SSH connection to it to verify its functionality.</p>
+<div class="listingblock">
+<div class="content">
+<pre>[student@workstation ~]$ ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.191
+$
+$ cat /etc/cirros/version
+0.5.2
+$</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_evaluation"><a class="anchor" href="#_evaluation"></a>Evaluation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As the stack user on the director machine, use the lab command to grade your work. Correct any reported failures and rerun the command until successful.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>[student@workstation ~]$ lab grade bfx021</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_finish"><a class="anchor" href="#_finish"></a>Finish</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As the student user on the workstation machine, use the lab command to complete this exercise. This step is important to ensure that resources from previous exercises do not impact upcoming exercises.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>[student@workstation ~]$ lab finish bfx021</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This concludes this section.</p>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="section1.html">Guided solution (page 1)</a></span>
+  <span class="next"><a href="../chapter3/section1.html">Summary</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
