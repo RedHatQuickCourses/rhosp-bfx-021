@@ -1,6 +1,6 @@
 site:
   title: RHOSP Networking Break-fix Practice - Troubleshooting VM Connectivity Issue
-  start_page: rhosp-bfx020::index.adoc
+  start_page: rhosp-bfx021::index.adoc
 
 content:
   sources:
