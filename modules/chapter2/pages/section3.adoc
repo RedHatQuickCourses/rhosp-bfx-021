@@ -1,0 +1,46 @@
+= Evalution
+
+Now that the instance has been rebooted, you can establish an SSH connection to it to verify its functionality.
++
+[source, bash]
+----
+ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@IP cat /etc/cirros/version
+----
++
+**Replace IP with appropriate string in both the above commands.**
++
+.Sample output
+----
+[student@workstation ~]$ ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.98 cat /etc/cirros/version
+0.5.2
+[student@workstation ~]$ 
+----
+
+Verify that this action is successful.
+
+
+== Evaluation
+
+As the stack user on the workstation vm, use the lab command to grade your work.
+
+[source, bash]
+----
+cd ~/osp_training/scenarios_repo/
+./lab grade bfx021
+----
+
+[NOTE]
+====
+Provide the gocubsgo as a password if prompted by the grade action.
+====
+
+== Finish
+
+Run the lab finish command to complete this exercise. This step is important to ensure that resources from current exercises do not impact upcoming exercises.
+
+----
+cd ~/osp_training/scenarios_repo/
+./lab finish bfx019
+----
+
+This concludes the lab exercise.

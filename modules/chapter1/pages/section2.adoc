@@ -1,6 +1,6 @@
 = Check your work
 
-== Check your work using the grading script
+== Check your work using the grading script:
 ----
 [student@workstation ~]$ lab grade bfx021
 Running grade action against scenario bfx021

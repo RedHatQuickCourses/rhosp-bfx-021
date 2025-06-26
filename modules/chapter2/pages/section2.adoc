@@ -1,139 +1,155 @@
 = Guided solution (page 2)
 
-1. Open the log file to see a detailed message.
-
-2. Now list the ports for the network associated with the instance and use openstack port list --network <network-name> --long to identify the ports.
+. List available networks in OpenStack cluster.
 +
+[source, bash]
+----
+oc exec -n openstack openstackclient -- openstack network list
+----
++
+.Sample output
 ----
 [student@workstation ~]$ oc exec -n openstack openstackclient -- openstack network list
 +--------------------------------------+-------------------------+--------------------------------------+
 | ID                                   | Name                    | Subnets                              |
 +--------------------------------------+-------------------------+--------------------------------------+
-| c84e1f23-9d86-47c9-9cd3-851633941dac | scenario-bfx021-network | 671e0166-173e-4c85-a925-dac8546d1bd7 |
-| ee961465-e812-4563-aaa8-05adb3476889 | public                  | 3c99909a-9d7a-486a-9df5-6e3fb210df61 |
+| 5526bfcf-a164-4a91-ad99-90bb5c41f500 | public                  | b5a9f748-df82-436a-b8e3-14912e258b5d |
+| d806b6c9-ee50-4cdf-9a79-2f58f3f6b8ce | scenario-bfx021-network | 89db0de7-6d5a-498a-948d-2e1ab26185f6 |
+| dded9e02-20c0-49ef-85aa-21b5e091e572 | private                 | 3e903f93-7638-41f0-96f2-538088a16aca |
 +--------------------------------------+-------------------------+--------------------------------------+
-
-[student@workstation ~]$ oc exec -n openstack openstackclient -- openstack port list --network scenario-bfx021-network --long
-+--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+-----------------+--------------------------+------+
-| ID                                   | Name | MAC Address       | Fixed IP Addresses                                                            | Status | Security Groups | Device Owner             | Tags |
-+--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+-----------------+--------------------------+------+
-| e20c4444-38e4-4ce6-9999-993e1f7882f4 |      | fa:16:3e:12:88:90 | ip_address='192.168.140.1', subnet_id='671e0166-173e-4c85-a925-dac8546d1bd7'  | ACTIVE | None            | network:router_interface |      |
-| fcdec0db-bf35-4792-9af6-5feee377efdd |      | fa:16:3e:df:19:9f | ip_address='192.168.140.99', subnet_id='671e0166-173e-4c85-a925-dac8546d1bd7' | ACTIVE | None            | compute:nova             |      |
-+--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+-----------------+--------------------------+------+
+[student@workstation ~]$ 
 ----
 
-
-3. List all the ports with device owner and device ID using openstack port list --network <network-name> --long -c id -c device_owner -c device_id.
+. Now list the ports for the network associated with the instance 
 +
+[source, bash]
+----
+oc exec -n openstack openstackclient -- openstack port list --network scenario-bfx021-network --long
+----
++
+.Sample output
+----
+[student@workstation ~]$ oc exec -n openstack openstackclient -- openstack port list --network scenario-bfx021-network --long
++--------------------------------------+------+-------------------+--------------------------------------------------------------------------------+--------+-----------------+--------------------------+------+
+| ID                                   | Name | MAC Address       | Fixed IP Addresses                                                             | Status | Security Groups | Device Owner             | Tags |
++--------------------------------------+------+-------------------+--------------------------------------------------------------------------------+--------+-----------------+--------------------------+------+
+| 5fdc2cfb-64a4-463b-b8b3-442aeed9e913 |      | fa:16:3e:44:dd:4b | ip_address='192.168.140.1', subnet_id='89db0de7-6d5a-498a-948d-2e1ab26185f6'   | ACTIVE | None            | network:router_interface |      |
+| e123fcf9-74bc-416e-a627-b11b2b630c62 |      | fa:16:3e:e6:a9:e3 | ip_address='192.168.140.180', subnet_id='89db0de7-6d5a-498a-948d-2e1ab26185f6' | ACTIVE | None            | compute:nova             |      |
++--------------------------------------+------+-------------------+--------------------------------------------------------------------------------+--------+-----------------+--------------------------+------+
+[student@workstation ~]$ 
+----
+
+. List all the ports with device owner and device ID.
++
+[source, bash]
+----
+oc exec -n openstack openstackclient -- openstack port list --network scenario-bfx021-network --long -c id -c device_owner -c device_id
+----
++
+.Sample output
 ----
 [student@workstation ~]$ oc exec -n openstack openstackclient -- openstack port list --network scenario-bfx021-network --long -c id -c device_owner -c device_id
 +--------------------------------------+--------------------------+-----------+
 | ID                                   | Device Owner             | device_id |
 +--------------------------------------+--------------------------+-----------+
-| e20c4444-38e4-4ce6-9999-993e1f7882f4 | network:router_interface | None      |
-| fcdec0db-bf35-4792-9af6-5feee377efdd | compute:nova             | None      |
+| 5fdc2cfb-64a4-463b-b8b3-442aeed9e913 | network:router_interface | None      |
+| e123fcf9-74bc-416e-a627-b11b2b630c62 | compute:nova             | None      |
 +--------------------------------------+--------------------------+-----------+
+[student@workstation ~]$ 
 ----
 +
-- You see that there is no port with device ID as ovn_meta.
-+
-- This port is missing here.
-+
+- You see that there is no port with device ID as **ovn_meta**.
+- ovn_meta port is missing here.
 - Each network needs to have this port.
-+
-- To fix this problem inside the Neutron api container there is a utility called neutron-ovn-db-sync-util which compares neutrons MySQL database with the OVN database and makes sure everything is in sync.
-+
+- To fix this problem inside the Neutron api container there is a utility called **neutron-ovn-db-sync-util** which compares neutrons MySQL database with the OVN database and makes sure everything is in sync.
 - The utility has multiple modes like log, repair, so on.
 
-4. Use OpenShift client to attach to neutron_api POD.
+. Use OpenShift client to attach to neutron_api POD.
 +
+[source, bash]
+----
+oc rsh -n openstack $(oc get pods -n openstack -l service=neutron -o name)
+----
++
+.Sample output
 ----
 [student@workstation ~]$ oc rsh -n openstack $(oc get pods -n openstack -l service=neutron -o name)
 Defaulted container "neutron-api" out of: neutron-api, neutron-httpd
-sh-5.1$
+sh-5.1$ 
 ----
 
-
-5. Within the POD, run neutron-ovn-db-sync-util in log mode.
+. **Within the POD**, run **neutron-ovn-db-sync-util** in log mode.
 +
+[source, bash]
 ----
 neutron-ovn-db-sync-util --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini --ovn-neutron_sync_mode log --debug | tee /tmp/neutron-ovn-db-sync-util.log
 ----
+**Make sure to run the above command within the pod**
 
-
-6. Check the toollogs in the POD.
+. Check the toollogs in the POD to look for messages related to instance's network.
 +
 ----
-[neutron@overcloud-controller-0 /]$ less /tmp/neutron-ovn-db-sync-util.log
+less /tmp/neutron-ovn-db-sync-util.log
+grep network-id /tmp/neutron-ovn-db-sync-util.log
 ----
-
-
-7. You observe that the metadata warning saying Missing metadata port found in Neutron network.
 +
+**Replace network-id in the above command with uuid of scenario-bfx021-network**
+*
+.Sample output
 ----
-2025-04-01 12:37:32.879 66 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [None req-b9d849c8-db41-4acd-8ede-2819c6fb279c - - - - - -] Missing metadata port found in Neutron for network c84e1f23-9d86-47c9-9cd3-851633941dacESC[00m
+sh-5.1$ grep d806b6c9-ee50-4cdf-9a79-2f58f3f6b8ce /tmp/neutron-ovn-db-sync-util.log
+2025-06-26 10:43:01.258 60 DEBUG neutron.services.segments.db [None req-7e5209ae-f072-4319-a91e-190156dbbdb5 - - - - - -] neutron.services.segments.plugin.Plugin method get_segments called with arguments (<neutron_lib.context.Context object at 0x7f54ab6077c0>,) {'filters': {'network_id': ['d806b6c9-ee50-4cdf-9a79-2f58f3f6b8ce']}} wrapper /usr/lib/python3.9/site-packages/oslo_log/helpers.py:65
+2025-06-26 10:43:01.635 60 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [None req-7e5209ae-f072-4319-a91e-190156dbbdb5 - - - - - -] Missing metadata port found in Neutron for network d806b6c9-ee50-4cdf-9a79-2f58f3f6b8ce
+sh-5.1$ 
 ----
++
+Observe the metadata warning saying Missing metadata port found in Neutron network.
 
-
-8. Now run the neutron-ovn-db-sync-util command with repair option.
+. Now run the neutron-ovn-db-sync-util command with repair option.
 +
 ----
 sh-5.1$ neutron-ovn-db-sync-util --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini --ovn-neutron_sync_mode repair --debug  | tee /tmp/neutron-ovn-db-sync-util.log
 ----
 
-
-9. Check the logs again and see that now the tool is repairing the missing metadata port: Creating missing metadata port in Neutron and OVN for network.
+. Check the logs again and see that now the tool is repairing the missing metadata port: Creating missing metadata port in Neutron and OVN for network.
++
+[source, bash]
+----
+grep network-id /tmp/neutron-ovn-db-sync-util.log
+----
++
+**Replace network-id in the above command with uuid of scenario-bfx021-network**
+*
+.Sample output
 +
 ----
-2025-04-01 12:38:44.473 75 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [None req-89b87fc9-c463-4464-87bc-62a221d17e89 - - - - - -] Missing metadata port found in Neutron for network c84e1f23-9d86-47c9-9cd3-851633941dac
-2025-04-01 12:38:44.474 75 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [None req-89b87fc9-c463-4464-87bc-62a221d17e89 - - - - - -] Creating missing metadata port in Neutron and OVN for network c84e1f23-9d86-47c9-9cd3-851633941dac
+sh-5.1$ grep d806b6c9-ee50-4cdf-9a79-2f58f3f6b8ce /tmp/neutron-ovn-db-sync-util.log
+2025-06-26 10:54:48.906 72 DEBUG neutron.services.segments.db [None req-1f2b416c-0b80-4387-9940-b5b14194c650 - - - - - -] neutron.services.segments.plugin.Plugin method get_segments called with arguments (<neutron_lib.context.Context object at 0x7f258e1467c0>,) {'filters': {'network_id': ['d806b6c9-ee50-4cdf-9a79-2f58f3f6b8ce']}} wrapper /usr/lib/python3.9/site-packages/oslo_log/helpers.py:65
+2025-06-26 10:54:49.210 72 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [None req-1f2b416c-0b80-4387-9940-b5b14194c650 - - - - - -] Missing metadata port found in Neutron for network d806b6c9-ee50-4cdf-9a79-2f58f3f6b8ce
+2025-06-26 10:54:49.211 72 WARNING neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovn_db_sync [None req-1f2b416c-0b80-4387-9940-b5b14194c650 - - - - - -] Creating missing metadata port in Neutron and OVN for network d806b6c9-ee50-4cdf-9a79-2f58f3f6b8ce
 ----
 
+. Exit from the pod's shell session to be back on the workstation vm's shell.
 
-10. Verify the metadata resources those were missing are now available after the DB sync.
+. Login to the compute node using ssh.
+
+. Verify the metadata resources those were missing are now available after the DB sync.
 +
+[source, bash]
 ----
-[root@compute02 ~]# ip net
-ovnmeta-c84e1f23-9d86-47c9-9cd3-851633941dac (id: 0)
-[root@compute02 ~]# podman ps | grep haproxy
-3b65c4ae3696  registry.redhat.io/rhoso/openstack-neutron-metadata-agent-ovn-rhel9@sha256:b01c35ee7c7bfb03c91981cbed675628e2a145cb9b0fb123370d4679907736f4  /bin/bash -c exec...  25 seconds ago  Up 25 seconds              neutron-haproxy-ovnmeta-c84e1f23-9d86-47c9-9cd3-851633941dac
+ip net
+podman ps | grep haproxy
 ----
 
-
-11. Restart the instance to fetch metadata on boot.
+. Restart the instance to fetch metadata on boot.
 +
+[source, bash]
 ----
-[student@workstation ~]$ oc exec -n openstack openstackclient -- openstack server reboot scenario-bfx021-vm
+oc exec -n openstack openstackclient -- openstack server reboot scenario-bfx021-vm
 ----
 +
 [NOTE]
 ====
-If you did not receive any output in the previous step (#20), re-run those commands after the VM has been rebooted.
+If you did not receive any output in the previous step, re-run those commands after the VM has been rebooted.
 ====
-
-
-12. Now that the instance has been rebooted, you can establish an SSH connection to it to verify its functionality.
-+
-----
-[student@workstation ~]$ ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.191
-$
-$ cat /etc/cirros/version
-0.5.2
-$
-----
-
-== Evaluation
-
-As the stack user on the director machine, use the lab command to grade your work. Correct any reported failures and rerun the command until successful.
-----
-[student@workstation ~]$ lab grade bfx021
-----
-
-== Finish
-
-As the student user on the workstation machine, use the lab command to complete this exercise. This step is important to ensure that resources from previous exercises do not impact upcoming exercises.
-----
-[student@workstation ~]$ lab finish bfx021
-----
-This concludes this section.
 
