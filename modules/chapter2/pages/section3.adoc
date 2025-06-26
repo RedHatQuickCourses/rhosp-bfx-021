@@ -1,14 +1,14 @@
 = Evalution
 
 Now that the instance has been rebooted, you can establish an SSH connection to it to verify its functionality.
-+
+
 [source, bash]
 ----
 ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@IP cat /etc/cirros/version
 ----
-+
+
 **Replace IP with appropriate string in both the above commands.**
-+
+
 .Sample output
 ----
 [student@workstation ~]$ ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.98 cat /etc/cirros/version
