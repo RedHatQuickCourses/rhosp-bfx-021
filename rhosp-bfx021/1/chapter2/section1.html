@@ -63,6 +63,9 @@
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../chapter1/section2.html">Check your work</a>
   </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chapter1/section3.html">Break-fix Scenario</a>
+  </li>
 </ul>
   </li>
 </ul>
@@ -75,6 +78,9 @@
 <ul class="nav-list">
   <li class="nav-item is-current-page" data-depth="2">
     <a class="nav-link" href="section1.html">Guided solution (page 1)</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="section2.html">Guided solution (page 2)</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="section2.html">Guided solution (page 2)</a>
@@ -130,56 +136,29 @@
 </aside>
 <article class="doc">
 <h1 class="page">Guided solution (page 1)</h1>
-<div class="sect1">
-<h2 id="_objectives"><a class="anchor" href="#_objectives"></a>Objectives</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>Investigate the instance connectivity issue in Red Hat OpenStack Platform.</p>
-</li>
-<li>
-<p>Solve the instance connectivity in the hands-on lab environment.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_outcomes"><a class="anchor" href="#_outcomes"></a>Outcomes</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>Investigate why ssh to instance is not working.</p>
-</li>
-<li>
-<p>Fix the ssh to instance failing issue.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_instructions"><a class="anchor" href="#_instructions"></a>Instructions</h2>
-<div class="sectionbody">
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Break the environment if you have not done it and step through the fix.</p>
+<p>Log in to your lab environment on the <strong>ROLE</strong> platform.</p>
+</li>
+<li>
+<p>Break the environment if you have not done it and then step through the fix.</p>
+<div class="paragraph">
+<p>As the <strong>student</strong> user, run the lab start script on the <strong>workstation</strong> VM to reproduce the issue.</p>
+</div>
 <div class="listingblock">
 <div class="content">
-<pre>[student@workstation ~]$ oc login -u admin -p redhatocp https://api.ocp4.example.com:6443
-Login successful.
-
-You have access to 76 projects, the list has been suppressed. You can list all projects with 'oc projects'
-
-Using project "openstack".
-
-[student@workstation ~]$ lab start bfx021
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd /home/student/osp_training/scenarios_repo/
+./lab start bfx021</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Sample output</div>
+<div class="content">
+<pre>[student@workstation ~]$ lab start bfx021
 Running start action against scenario bfx021
 Run the following command:
-ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.191</pre>
+ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.98</pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -189,32 +168,54 @@ ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-<div class="paragraph">
-<p>When you run any command with sudo, in case it expects a password then provide the student as a password.</p>
-</div>
+The IP address in the displayed output may differ in your case.
 </td>
 </tr>
 </table>
 </div>
 </li>
 <li>
-<p>Run the ssh command from the previous lab command output and notice the Connection closed error. Also run the ping command against instance IP.</p>
+<p>Run the ssh command from the previous lab command output and notice the Connection timed out error. Also run the ping command against instance IP.</p>
 <div class="listingblock">
 <div class="content">
-<pre>[student@workstation ~]$ ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.191
-Connection closed by 192.168.51.191 port 22
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">ssh -i /home/student/osp_training/.scenariobfx019/scenario-bfx019-key.pem cirros@instance.ip.in.your.lab</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">ping instance.ip.in.your.lab -c 1</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+In the above commands <strong>replace</strong> the string <strong>instance.ip.in.your.lab</strong> with the <strong>actual IP</strong> address displayed in the output of the lab start script.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">Sample output</div>
+<div class="content">
+<pre>[student@workstation ~]$ ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.98
+Connection closed by 192.168.51.98 port 22
 
-[student@workstation ~]$ ping 192.168.51.191 -c 1
-PING 192.168.51.191 (192.168.51.191) 56(84) bytes of data.
-64 bytes from 192.168.51.191: icmp_seq=1 ttl=63 time=2.41 ms
+[student@workstation ~]$ ping 192.168.51.98 -c 1
+PING 192.168.51.98 (192.168.51.98) 56(84) bytes of data.
+64 bytes from 192.168.51.98: icmp_seq=1 ttl=62 time=0.949 ms
 
---- 192.168.51.191 ping statistics ---
+--- 192.168.51.98 ping statistics ---
 1 packets transmitted, 1 received, 0% packet loss, time 0ms
-rtt min/avg/max/mdev = 2.409/2.409/2.409/0.000 ms</pre>
+rtt min/avg/max/mdev = 0.949/0.949/0.949/0.000 ms
+[student@workstation ~]$</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>You observe that you can ping the instance but not able to ssh to it.</p>
+<p><strong>You observe that you can ping the instance but not able to ssh to it.</strong></p>
 </div>
 </li>
 <li>
@@ -224,8 +225,8 @@ rtt min/avg/max/mdev = 2.409/2.409/2.409/0.000 ms</pre>
 <p>Use either the nc (netcat) or telnet command to verify the connectivity.</p>
 <div class="listingblock">
 <div class="content">
-<pre>[student@workstation ~]$ nc 192.168.51.191 22
-[student@workstation ~]$ telnet 192.168.51.191 22</pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">nc 192.168.51.98 22
+telnet 192.168.51.98 22</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -260,8 +261,11 @@ rtt min/avg/max/mdev = 2.409/2.409/2.409/0.000 ms</pre>
 <p>Run the SSH command in verbose mode (use the -vvv flag) to gain more detailed insights into the authentication process.</p>
 <div class="listingblock">
 <div class="content">
-<pre>[student@workstation ~]$ ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.191 -vvv</pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">ssh -i /home/student/osp_training/.scenariobfx019/scenario-bfx019-key.pem cirros@instance.ip.in.your.lab -vvv</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p><strong>replace</strong> the string <strong>instance.ip.in.your.lab</strong> with the <strong>actual IP</strong> address displayed in the output of the lab start script.</p>
 </div>
 <div class="ulist">
 <ul>
@@ -281,21 +285,34 @@ rtt min/avg/max/mdev = 2.409/2.409/2.409/0.000 ms</pre>
 <p>Use the openstack server list --long command to list instances and identify the compute node hosting your instance.</p>
 <div class="listingblock">
 <div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc exec -n openstack openstackclient -- openstack server list --long</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Sample output</div>
+<div class="content">
 <pre>[student@workstation ~]$ oc exec -n openstack openstackclient -- openstack server list --long
 +--------------------------------------+--------------------+--------+------------+-------------+--------------------------------------------------------+---------------------+--------------------------------------+----------+-------------------+---------------------------+------------+-------------+
 | ID                                   | Name               | Status | Task State | Power State | Networks                                               | Image Name          | Image ID                             | Flavor   | Availability Zone | Host                      | Properties | Host Status |
 +--------------------------------------+--------------------+--------+------------+-------------+--------------------------------------------------------+---------------------+--------------------------------------+----------+-------------------+---------------------------+------------+-------------+
-| 6843b5d4-f6b8-4f66-933b-88dd381b2ce3 | scenario-bfx021-vm | ACTIVE | None       | Running     | scenario-bfx021-network=192.168.140.99, 192.168.51.191 | cirros-0.5.2-x86_64 | 10210206-c30a-4765-8547-0dad335b5675 | m1.small | nova              | compute02.srv.example.com |            | UP          |
-+--------------------------------------+--------------------+--------+------------+-------------+--------------------------------------------------------+---------------------+--------------------------------------+----------+-------------------+---------------------------+------------+-------------+</pre>
+| 859334f3-966b-4a4f-9cef-b923b5b168dc | scenario-bfx021-vm | ACTIVE | None       | Running     | scenario-bfx021-network=192.168.140.180, 192.168.51.98 | cirros-0.5.2-x86_64 | efe0f0f6-7cd4-4ff4-878e-8ffbccd738d7 | m1.small | nova              | compute01.srv.example.com |            | UP          |
++--------------------------------------+--------------------+--------+------------+-------------+--------------------------------------------------------+---------------------+--------------------------------------+----------+-------------------+---------------------------+------------+-------------+
+[student@workstation ~]$</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Per above output, the instance is running on compute02.srv.example.com, this might vary in your case.</p>
+<p>Per above output, the instance is running on compute01.srv.example.com, this might vary in your case.</p>
 </div>
 </li>
 <li>
 <p>Log in to the compute node where the instance is running. You might use SSH to connect to the node.</p>
 <div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">ssh root@compute02.srv.example.com</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Sample output</div>
 <div class="content">
 <pre>[student@workstation ~]$ ssh root@compute02.srv.example.com
 Activate the web console with: systemctl enable --now cockpit.socket
@@ -312,13 +329,21 @@ Last login: Mon Mar 31 09:31:34 2025 from 192.168.51.254
 <p>Investigate the metadata service on the compute node by verifying if the necessary metadata resources are correctly provisioned or not.</p>
 <div class="listingblock">
 <div class="content">
-<pre>[root@compute02 ~]# podman ps -a | grep ovn_metadata_agent
-528faed57842  registry.redhat.io/rhoso/openstack-neutron-metadata-agent-ovn-rhel9@sha256:b01c35ee7c7bfb03c91981cbed675628e2a145cb9b0fb123370d4679907736f4  kolla_start  4 months ago  Up 4 hours              ovn_metadata_agent
-
-[root@compute02 ~]# ip net
-[root@compute02 ~]#
-
-[root@compute02 ~]# podman ps -a | grep haproxy</pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">podman ps -a | grep ovn_metadata_agent
+ip net
+podman ps -a | grep haproxy</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Sample output</div>
+<div class="content">
+<pre>[root@compute01 ~]# podman ps -a | grep ovn_metadata_agent
+393aca2672c7  registry.redhat.io/rhoso/openstack-neutron-metadata-agent-ovn-rhel9@sha256:b01c35ee7c7bfb03c91981cbed675628e2a145cb9b0fb123370d4679907736f4  kolla_start  7 weeks ago  Up 8 days               ovn_metadata_agent
+[root@compute01 ~]#
+[root@compute01 ~]# ip net
+[root@compute01 ~]#
+[root@compute01 ~]# podman ps -a | grep haproxy
+[root@compute01 ~]#</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -326,31 +351,60 @@ Last login: Mon Mar 31 09:31:34 2025 from 192.168.51.254
 </div>
 </li>
 <li>
-<p>Now list the ports for the network associated with the instance. You need to use openstack port list --network &lt;network-name&gt; --long to identify the ports and list the ports for the network associated with the instance.</p>
-<div class="listingblock">
-<div class="content">
-<pre>[student@workstation ~]$ oc exec -n openstack openstackclient -- openstack port list --server scenario-bfx021-vm
-+--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+
-| ID                                   | Name | MAC Address       | Fixed IP Addresses                                                            | Status |
-+--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+
-| fcdec0db-bf35-4792-9af6-5feee377efdd |      | fa:16:3e:df:19:9f | ip_address='192.168.140.99', subnet_id='671e0166-173e-4c85-a925-dac8546d1bd7' | ACTIVE |
-+--------------------------------------+------+-------------------+-------------------------------------------------------------------------------+--------+</pre>
-</div>
-</div>
+<p>Exit from compute to get back to the workstation vm.</p>
 </li>
 <li>
-<p>Look for the port ID in the compute node&#8217;s ovn-mtadata-agent.log file.</p>
+<p>Now list the ports for the network associated with the instance.</p>
 <div class="listingblock">
 <div class="content">
-<pre>[root@compute02 ~]# grep fcdec0db-bf35-4792-9af6-5feee377efdd /var/log/containers/neutron/ovn-metadata-agent.log
-2025-04-01 10:48:43.009 2354 DEBUG ovsdbapp.backend.ovs_idl.event [-] Matched UPDATE: PortBindingUpdatedEvent(events=('update',), table='Port_Binding', conditions=None, old_conditions=None), priority=20 to row=Port_Binding(mac=['fa:16:3e:df:19:9f 192.168.140.99'], port_security=['fa:16:3e:df:19:9f 192.168.140.99'], type=, nat_addresses=[], virtual_parent=[], up=[False], options={'requested-chassis': 'compute02.srv.example.com'}, parent_port=[], requested_additional_chassis=[], ha_chassis_group=[], external_ids={'neutron:cidrs': '192.168.140.99/24', 'neutron:device_id': '6843b5d4-f6b8-4f66-933b-88dd381b2ce3', 'neutron:device_owner': 'compute:nova', 'neutron:mtu': '', 'neutron:network_name': 'neutron-c84e1f23-9d86-47c9-9cd3-851633941dac', 'neutron:port_capabilities': '', 'neutron:port_name': '', 'neutron:project_id': '7ac1618d984947c0bfcbf713a94fed4a', 'neutron:revision_number': '2', 'neutron:security_group_ids': 'b807a477-7a1c-4d22-ae3d-a9f7c7975701', 'neutron:subnet_pool_addr_scope4': '', 'neutron:subnet_pool_addr_scope6': '', 'neutron:vnic_type': 'normal'}, additional_chassis=[], tag=[], additional_encap=[], encap=[], mirror_rules=[], datapath=b2c6aad5-a91c-46d6-a224-3e3aac7ff061, chassis=[&lt;ovs.db.idl.Row object at 0x7f5c074917c0&gt;], tunnel_key=3, gateway_chassis=[], requested_chassis=[&lt;ovs.db.idl.Row object at 0x7f5c074917c0&gt;], logical_port=fcdec0db-bf35-4792-9af6-5feee377efdd) old=Port_Binding(chassis=[]) matches /usr/lib/python3.9/site-packages/ovsdbapp/backend/ovs_idl/event.py:43
-2025-04-01 10:48:43.010 2354 INFO neutron.agent.ovn.metadata.agent [-] Port fcdec0db-bf35-4792-9af6-5feee377efdd in datapath c84e1f23-9d86-47c9-9cd3-851633941dac bound to our chassis</pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc exec -n openstack openstackclient -- openstack port list --server scenario-bfx021-vm</code></pre>
 </div>
 </div>
 </li>
 </ol>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre>[student@workstation ~]$ oc exec -n openstack openstackclient -- openstack port list --server scenario-bfx021-vm
++--------------------------------------+------+-------------------+--------------------------------------------------------------------------------+--------+
+| ID                                   | Name | MAC Address       | Fixed IP Addresses                                                             | Status |
++--------------------------------------+------+-------------------+--------------------------------------------------------------------------------+--------+
+| e123fcf9-74bc-416e-a627-b11b2b630c62 |      | fa:16:3e:e6:a9:e3 | ip_address='192.168.140.180', subnet_id='89db0de7-6d5a-498a-948d-2e1ab26185f6' | ACTIVE |
++--------------------------------------+------+-------------------+--------------------------------------------------------------------------------+--------+</pre>
 </div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Look for the port ID in the compute node&#8217;s ovn-mtadata-agent.log file.</p>
+</li>
+<li>
+<p>Login again to the associated compute node and execute below command.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">grep port_id /var/log/containers/neutron/ovn-metadata-agent.log</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Replace the port_id string with appropriate port id that was captured in the earlier command.</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Sample output</div>
+<div class="content">
+<pre>[root@compute01 ~]# grep e123fcf9-74bc-416e-a627-b11b2b630c62 /var/log/containers/neutron/ovn-metadata-agent.log*
+/var/log/containers/neutron/ovn-metadata-agent.log.1:2025-06-25 06:10:05.342 2261 DEBUG ovsdbapp.backend.ovs_idl.event [-] Matched UPDATE: PortBindingUpdatedEvent(events=('update',), table='Port_Binding', conditions=None, old_conditions=None), priority=20 to row=Port_Binding(mac=['fa:16:3e:e6:a9:e3 192.168.140.180'], port_security=['fa:16:3e:e6:a9:e3 192.168.140.180'], type=, nat_addresses=[], virtual_parent=[], up=[False], options={'requested-chassis': 'compute01.srv.example.com'}, parent_port=[], requested_additional_chassis=[], ha_chassis_group=[], external_ids={'neutron:cidrs': '192.168.140.180/24', 'neutron:device_id': '859334f3-966b-4a4f-9cef-b923b5b168dc', 'neutron:device_owner': 'compute:nova', 'neutron:mtu': '', 'neutron:network_name': 'neutron-d806b6c9-ee50-4cdf-9a79-2f58f3f6b8ce', 'neutron:port_capabilities': '', 'neutron:port_name': '', 'neutron:project_id': 'd388b58059514443a8dced8c2ed691f6', 'neutron:revision_number': '2', 'neutron:security_group_ids': '9a6f20f9-de2e-4d40-824d-4856be72d0ed', 'neutron:subnet_pool_addr_scope4': '', 'neutron:subnet_pool_addr_scope6': '', 'neutron:vnic_type': 'normal'}, additional_chassis=[], tag=[], additional_encap=[], encap=[], mirror_rules=[], datapath=2b4395ab-7242-44ed-9d5d-7888266e2847, chassis=[&lt;ovs.db.idl.Row object at 0x7fab2cb9dfa0&gt;], tunnel_key=3, gateway_chassis=[], requested_chassis=[&lt;ovs.db.idl.Row object at 0x7fab2cb9dfa0&gt;], logical_port=e123fcf9-74bc-416e-a627-b11b2b630c62) old=Port_Binding(chassis=[]) matches /usr/lib/python3.9/site-packages/ovsdbapp/backend/ovs_idl/event.py:43
+/var/log/containers/neutron/ovn-metadata-agent.log.1:2025-06-25 06:10:05.346 2261 INFO neutron.agent.ovn.metadata.agent [-] Port e123fcf9-74bc-416e-a627-b11b2b630c62 in datapath d806b6c9-ee50-4cdf-9a79-2f58f3f6b8ce bound to our chassis
+[root@compute01 ~]#</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Open the log file to see the detailed message.</p>
+</li>
+<li>
+<p>Exit from the compute node to get back to the workstation vm.</p>
+</li>
+</ol>
 </div>
 <nav class="pagination">
   <span class="prev"><a href="index.html">Guided solution</a></span>

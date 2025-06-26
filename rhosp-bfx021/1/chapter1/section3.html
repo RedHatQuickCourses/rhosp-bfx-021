@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Break-fix Scenario :: RHOSP Networking Break-fix Practice - Troubleshooting VM Connectivity Issue</title>
+    <link rel="prev" href="section2.html">
+    <link rel="next" href="../chapter2/index.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../_/css/site.css">
     <script>var uiRootPath = '../../../_'</script>
@@ -61,6 +63,9 @@
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="section2.html">Check your work</a>
   </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="section3.html">Break-fix Scenario</a>
+  </li>
 </ul>
   </li>
 </ul>
@@ -73,6 +78,9 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../chapter2/section1.html">Guided solution (page 1)</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chapter2/section2.html">Guided solution (page 2)</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../chapter2/section2.html">Guided solution (page 2)</a>
@@ -117,6 +125,7 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">RHOSP Networking Break-fix Practice - Troubleshooting VM Connectivity Issue</a></li>
+    <li><a href="index.html">What’s in this break-fix?</a></li>
     <li><a href="section3.html">Break-fix Scenario</a></li>
   </ul>
 </nav>
@@ -143,8 +152,10 @@
 </ul>
 </div>
 <div class="paragraph">
-<p>Scenario:
-Your team manages a Red Hat OpenStack Platform (RHOSP) infrastructure used by an important development team for your company. There was a requirement from your internal networking team to have Open Virtual Network (OVN), an open-source software-defined networking (SDN) solution that seamlessly integrates with OpenStack. Recently networking team noticed that there is connectivity issue with instance running in OpenStack envrionment.</p>
+<p>Scenario:</p>
+</div>
+<div class="paragraph">
+<p>Your team manages a Red Hat OpenStack Platform (RHOSP) infrastructure used by an important development team for your company. There was a requirement from your internal networking team to have Open Virtual Network (OVN), an open-source software-defined networking (SDN) solution that seamlessly integrates with OpenStack. Recently networking team noticed that there is connectivity issue with instance running in OpenStack envrionment.</p>
 </div>
 <div class="paragraph">
 <p>They noticed the following error:</p>
@@ -160,42 +171,80 @@ Connection closed by 192.168.51.191 port 22</pre>
 <div class="sect1">
 <h2 id="_recreate_scenario"><a class="anchor" href="#_recreate_scenario"></a>Recreate scenario</h2>
 <div class="sectionbody">
-<div class="ulist">
-<ul>
+<div class="olist arabic">
+<ol class="arabic">
 <li>
-<p>Recreate this scenario by running the lab` script on director VM as stack user:</p>
+<p>Log in to your lab environment on the <strong>ROLE</strong> platform.</p>
 </li>
-</ul>
-</div>
+<li>
+<p>As the <strong>student</strong> user, run the lab start script on the <strong>workstation</strong> VM to reproduce the issue.</p>
 <div class="listingblock">
 <div class="content">
-<pre>[student@workstation ~]$ oc login -u admin -p redhatocp https://api.ocp4.example.com:6443
-Login successful.
-
-You have access to 76 projects, the list has been suppressed. You can list all projects with 'oc projects'
-
-Using project "openstack".
-
-[student@workstation ~]$ lab start bfx021
-Running start action against scenario bfx021
-Run the following command:
-ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.191</pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"> ----
+cd /home/student/osp_training/scenarios_repo/
+./lab start bfx021
+----</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>In the preceding output, ip address can differ in your lab environemnt.</p>
+<p>The lab customization script is already cloned in the <strong>/home/student/osp_training/scenarios_repo/</strong> directory.</p>
 </div>
-<div class="ulist">
-<ul>
+<div class="listingblock">
+<div class="title">Sample output</div>
+<div class="content">
+<pre>[student@workstation ~]$ cd /home/student/osp_training/scenarios_repo/
+[student@workstation scenarios_repo]$ ./lab start bfx021
+Running start action against scenario bfx021
+Run the following command:
+ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.98
+
+[student@workstation scenarios_repo]$</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the preceding output, IP address can differ in your lab environment.</p>
+</div>
+</li>
 <li>
-<p>This breaks the connectivity to instance.</p>
+<p>This creates an instance with broken ssh connectivity.</p>
 </li>
 <li>
 <p>To ensure scenario is recreated, run the ssh command from the previous output:</p>
 <div class="listingblock">
+<div class="title">Sample output</div>
 <div class="content">
-<pre>[student@workstation ~]$ ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.191
-Connection closed by 192.168.51.191 port 22</pre>
+<pre>[student@workstation ~]$ ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.98
+Connection closed by 192.168.51.98 port 22</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><strong>IMPORTANT NOTE:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>If the lab script fails, you will not see the ssh command for instance connectivity.</p>
+</li>
+<li>
+<p>Wait a few minutes for the lab to initialize properly, then re-run the lab start script.</p>
+</li>
+<li>
+<p>You can retrieve the instance connectivity message generated by the lab script at any time by running the following command.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cat ~/osp_training/.scenariobfx021/message</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Run the lab finish script if you wish to clean up the environment either to start fresh or to switch to another scenario.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd /home/student/osp_training/scenarios_repo/
+./lab finish bfx019</code></pre>
 </div>
 </div>
 </li>
@@ -203,6 +252,10 @@ Connection closed by 192.168.51.191 port 22</pre>
 </div>
 </div>
 </div>
+<nav class="pagination">
+  <span class="prev"><a href="section2.html">Check your work</a></span>
+  <span class="next"><a href="../chapter2/index.html">Guided solution</a></span>
+</nav>
 </article>
   </div>
 </main>
