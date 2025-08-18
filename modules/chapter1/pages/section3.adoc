@@ -70,5 +70,5 @@ cat ~/osp_training/.scenariobfx021/message
 [source, bash]
 ----
 cd /home/student/osp_training/scenarios_repo/
-./lab finish bfx019
+./lab finish bfx021
 ----

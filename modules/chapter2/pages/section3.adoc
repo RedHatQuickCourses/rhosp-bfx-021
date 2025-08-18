@@ -40,7 +40,7 @@ Run the lab finish command to complete this exercise. This step is important to 
 
 ----
 cd ~/osp_training/scenarios_repo/
-./lab finish bfx019
+./lab finish bfx021
 ----
 
 This concludes the lab exercise.

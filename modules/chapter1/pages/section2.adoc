@@ -5,7 +5,7 @@
 [student@workstation ~]$ lab grade bfx021
 Running grade action against scenario bfx021
 cirros@192.168.51.191's password:
-Grading scenario bfx022: PASSED!
+Grading scenario bfx021: PASSED!
 ----
 Instance IP address from the preceding output can differ in your environment.
 [NOTE]
@@ -15,7 +15,7 @@ Provide the gocubsgo as a password.
 == Success Criteria
 Successful completion of this activity requires that ssh to instance is working:
 ----
-[student@workstation ~]$ ssh -i /home/student/osp_training/.scenariobfx020/scenario-bfx020-key.pem cirros@192.168.51.191
+[student@workstation ~]$ ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.191
 sign_and_send_pubkey: no mutual signature supported
 cirros@192.168.51.191's password:
 $
