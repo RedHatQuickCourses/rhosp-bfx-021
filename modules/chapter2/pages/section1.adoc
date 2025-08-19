@@ -13,7 +13,7 @@ cd /home/student/osp_training/scenarios_repo/
 +
 .Sample output
 ----
-[student@workstation ~]$ lab start bfx021
+[student@workstation scenarios_repo]$ ./lab start bfx021
 Running start action against scenario bfx021
 Run the following command:
 ssh -i /home/student/osp_training/.scenariobfx021/scenario-bfx021-key.pem cirros@192.168.51.98
