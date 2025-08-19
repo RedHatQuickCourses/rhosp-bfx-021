@@ -397,6 +397,14 @@ podman ps -a | grep haproxy</code></pre>
 [root@compute01 ~]#</pre>
 </div>
 </div>
+<div class="paragraph">
+<p>Starting with <strong>RHOSO 18.0.1</strong>, the neutron-ovn-metadata-agent uses the system journal instead of traditional log files. If you are using <strong>RHOSO 18.0.1 or later</strong>, use <code>journalctl</code> to check the logs.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>[root@compute01 ~]# journalctl --unit edpm_ovn_metadata_agent.service</pre>
+</div>
+</div>
 </li>
 <li>
 <p>Open the log file to see the detailed message.</p>
