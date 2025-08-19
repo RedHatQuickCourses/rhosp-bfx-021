@@ -105,6 +105,25 @@ sh-5.1$
 +
 Observe the metadata warning saying Missing metadata port found in Neutron network.
 
+. Before running the neutron-ovn-db-sync-util command with the repair option, it is recommended to disable access to the Neutron API. This ensures that no new changes are made to the Neutron database while the neutron-ovn-db-sync-util tool is running. For example, you can achieve this by adding a custom NetworkPolicy.
++
+[source, bash]
+----
+[student@workstation ~]$ echo "apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-ingress-to-neutron-api
+spec:
+  podSelector:
+    matchLabels:
+      service: neutron
+  policyTypes:
+  - Ingress
+  ingress: []
+" | oc apply -f -
+networkpolicy.networking.k8s.io/deny-ingress-to-neutron-api created
+----
+
 . Now run the neutron-ovn-db-sync-util command with repair option.
 +
 ----
@@ -130,6 +149,14 @@ sh-5.1$ grep d806b6c9-ee50-4cdf-9a79-2f58f3f6b8ce /tmp/neutron-ovn-db-sync-util.
 ----
 
 . Exit from the pod's shell session to be back on the workstation vm's shell.
+
+. Remove the NetworkPolicy that was previously created to restore access to the Neutron API.
++
+[source, bash]
+----
+[student@workstation ~]$ oc delete networkpolicy deny-ingress-to-neutron-api
+networkpolicy.networking.k8s.io/deny-ingress-to-neutron-api deleted
+----
 
 . Login to the compute node using ssh.
 
