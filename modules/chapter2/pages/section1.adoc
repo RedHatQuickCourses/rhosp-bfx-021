@@ -186,7 +186,13 @@ grep port_id /var/log/containers/neutron/ovn-metadata-agent.log
 /var/log/containers/neutron/ovn-metadata-agent.log.1:2025-06-25 06:10:05.346 2261 INFO neutron.agent.ovn.metadata.agent [-] Port e123fcf9-74bc-416e-a627-b11b2b630c62 in datapath d806b6c9-ee50-4cdf-9a79-2f58f3f6b8ce bound to our chassis
 [root@compute01 ~]# 
 ----
-
++
+Starting with **RHOSO 18.0.1**, the neutron-ovn-metadata-agent uses the system journal instead of traditional log files. If you are using **RHOSO 18.0.1 or later**, use `journalctl` to check the logs.
++
+----
+[root@compute01 ~]# journalctl --unit edpm_ovn_metadata_agent.service
+----
++
 . Open the log file to see the detailed message.
 
 . Exit from the compute node to get back to the workstation vm.
